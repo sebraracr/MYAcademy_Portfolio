@@ -26,7 +26,6 @@
     <Folder Include="Properties\" />
     <Folder Include="ViewComponents\AdminViewComponents\" />
     <Folder Include="ViewComponents\StatisticViewComponents\" />
-    <Folder Include="Views\Shared\Components\" />
   </ItemGroup>
 
 </Project>
