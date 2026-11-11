@@ -10,5 +10,6 @@
         public string Duration { get; set; }
         public string WorkType { get; set; }
         public bool IsActive { get; set; }
+        public List<Skill> Skills { get; set; }
     }
 }
