@@ -7,5 +7,6 @@
         public int SkillCategoryId { get; set; }
         public SkillCategory SkillCategory { get; set; }
         public List<Experience> Experiences { get; set; }
+        public List<Project> Projects { get; set; }
     }
 }

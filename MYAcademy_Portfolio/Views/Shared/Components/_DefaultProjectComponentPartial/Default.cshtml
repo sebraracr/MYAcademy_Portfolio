@@ -10,18 +10,25 @@
         </div>
 
         <!-- Category Filter Buttons -->
-        <div class="d-flex justify-content-center flex-wrap gap-2 mb-5 reveal-on-scroll" id="projectFilterGroup">
-            <button class="filter-btn active" data-filter="all">Tümü</button>
-            <button class="filter-btn" data-filter="web-app">Web Uygulamaları</button>
-            <button class="filter-btn" data-filter="dashboard">Dashboard</button>
-            <button class="filter-btn" data-filter="api-projects">API Projeleri</button>
-        </div>
+        <div class="d-flex justify-content-center flex-wrap gap-2 mb-5 reveal-on-scroll"
+             id="projectFilterGroup">
 
+            <button type="button" class="filter-btn active" data-filter="all">
+                Tümü
+            </button>
+
+            @foreach (var project in Model.DistinctBy(p => p.CategoryId))
+            {
+                <button type="button" class="filter-btn" data-filter="@project.CategoryId">
+                    @project.Category.CategoryName
+                </button>
+            }
+        </div>
         <!-- Project Cards Grid -->
         <div class="row g-4" id="projectGrid">
             @foreach (var item in Model)
             {
-                <div class="col-lg-4 col-md-6 project-item" data-category="web-app">
+                <div class="col-lg-4 col-md-6 project-item" data-category="@item.CategoryId">
                     <div class="project-card reveal-on-scroll">
 
                         <!-- Project Image -->
@@ -43,15 +50,12 @@
                             <h3 class="project-title">@item.Title</h3>
 
                             <p class="project-desc">@item.Description</p>
-
-                            <!-- Technologies -->
-                            <div class="mb-3">
-                                <span class="tech-tag">ASP.NET Core</span>
-                                <span class="tech-tag">EF Core</span>
-                                <span class="tech-tag">SQL Server</span>
-                                <span class="tech-tag">Bootstrap</span>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                @foreach (var skill in item.Skills)
+                                {
+                                    <span class="tech-tag">@skill.Name</span>
+                                }
                             </div>
-
                             <!-- Project Links -->
                             <div class="project-footer">
                                 <a href="@item.GithubUrl"

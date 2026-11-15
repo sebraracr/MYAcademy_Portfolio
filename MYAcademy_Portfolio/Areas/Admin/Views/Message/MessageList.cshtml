@@ -1,35 +1,792 @@
 ﻿@model List<MYAcademy_Portfolio.Entities.Message>
 
 @{
-    ViewData["Title"] = "MessageList";
+    ViewData["Title"] = "Gelen Kutusu";
     Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
+
+    var mesajlar = Model.OrderByDescending(x => x.SendDate).ToList();
+    var toplam = mesajlar.Count;
+    var okunmamis = mesajlar.Count(x => !x.IsRead);
+    var okunmus = toplam - okunmamis;
 }
 
-<div class="container">
-     <br />
-     <table class="table table-bordered">
-         <tr>
-             <th>#</th>
-             <th>Gönderici</th>
-             <th>Email</th>
-             <th>Konu</th>
-             <th>Tarih</th>
-             <th>Mesajı Aç</th>
-             <th>Sil</th>
-         </tr>
-        @foreach(var item in Model)
-        {
-            <tr>
-                <td>@item.MessageId</td>
-                <td>@item.NameSurname</td>
-                <td>@item.Email</td>
-                <td>@item.Subject</td>
-                <td>@item.SendDate.ToString("dd MMM yyyy")</td>
-                <td><a href="/Admin/Message/MessageDetail/@item.MessageId" class="btn btn-primary">Mesajı Aç</a></td>
-                <td><a href="/Admin/Message/DeleteMessage/@item.MessageId" class="btn btn-danger">Sil</a></td>
-            </tr>
+<style>
+    .inbox {
+        --bg: #f4f3ef;
+        --surface: #fffefb;
+        --line: #ebe8df;
+        --ink: #1f2421;
+        --muted: #7b807c;
+        --green: #86a08b;
+        --green-dark: #4f6d56;
+        --green-soft: #e3ece5;
+        --blue-soft: #e4edf6;
+        --amber-soft: #f6eddc;
+        --rose-soft: #f4e6e1;
+        --rose-ink: #b4584a;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: var(--ink);
+    }
+
+        .inbox .intro {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 20px;
         }
 
-     </table>
+    /* ---------- Özet kartları ---------- */
+    .stat-row {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+    }
 
+    .stat-card {
+        flex: 0 1 260px;
+        min-width: 200px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 15px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 17px;
+    }
+
+        .stat-icon.total {
+            background: var(--blue-soft);
+            color: #587a9c;
+        }
+
+        .stat-icon.unread {
+            background: var(--green-soft);
+            color: var(--green-dark);
+        }
+
+        .stat-icon.read {
+            background: var(--amber-soft);
+            color: #9a7f3f;
+        }
+
+    .stat-label {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 500;
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.15;
+    }
+
+    /* ---------- Kart ve araç çubuğu ---------- */
+    .inbox-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .inbox-tools {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .tabs {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .tab {
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 7px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+        .tab:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        .tab.active {
+            background: var(--green-soft);
+            color: var(--green-dark);
+            border-color: #cfe0d3;
+        }
+
+        .tab .count {
+            font-size: 11px;
+            background: rgba(0, 0, 0, .06);
+            border-radius: 999px;
+            padding: 1px 7px;
+        }
+
+    .tools-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .search-box input {
+            border: 1px solid var(--line);
+            background: var(--bg);
+            border-radius: 9px;
+            font-size: 12px;
+            padding: 8px 12px 8px 32px;
+            width: 260px;
+            font-family: inherit;
+            color: var(--ink);
+        }
+
+    .sort-btn {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 9px;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 12px;
+        color: var(--ink);
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+    }
+
+        .sort-btn:hover {
+            background: var(--bg);
+        }
+
+        .search-box input:focus,
+        .sort-btn:focus-visible,
+        .tab:focus-visible {
+            outline: 2px solid var(--green);
+            outline-offset: 1px;
+        }
+
+    /* ---------- Mesaj satırları ---------- */
+    .msg-row {
+        display: grid;
+        grid-template-columns: 40px 1fr auto auto;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px 14px 20px;
+        border-bottom: 1px solid var(--line);
+        position: relative;
+        transition: background .15s;
+    }
+
+        .msg-row:last-of-type {
+            border-bottom: 0;
+        }
+
+        .msg-row:hover {
+            background: #faf9f4;
+        }
+
+        .msg-row.is-unread {
+            background: #f8fbf8;
+        }
+
+            .msg-row.is-unread:hover {
+                background: #f2f8f3;
+            }
+
+            .msg-row.is-unread::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 10px;
+                bottom: 10px;
+                width: 3px;
+                border-radius: 0 3px 3px 0;
+                background: var(--green);
+            }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #efede6;
+        color: #5a5f5b;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .is-unread .avatar {
+        background: var(--green-soft);
+        color: var(--green-dark);
+    }
+
+    .msg-main {
+        border: 0;
+        background: transparent;
+        text-align: left;
+        padding: 0;
+        font-family: inherit;
+        color: inherit;
+        cursor: pointer;
+        min-width: 0;
+    }
+
+        .msg-main:focus-visible {
+            outline: 2px solid var(--green);
+            outline-offset: 4px;
+            border-radius: 6px;
+        }
+
+    .msg-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 2px;
+    }
+
+    .sender {
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .is-unread .sender {
+        font-weight: 700;
+    }
+
+    .email {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .chip {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #ecebe5;
+        color: #6a6f6b;
+    }
+
+    .is-unread .chip {
+        background: #e0eee3;
+        color: #3f7a52;
+    }
+
+    .subject-line {
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .is-unread .subject-line {
+        font-weight: 600;
+    }
+
+    .subject-line .preview {
+        color: var(--muted);
+        font-weight: 400;
+    }
+
+    .msg-date {
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+    }
+
+    .msg-actions {
+        display: flex;
+        gap: 6px;
+    }
+
+    .act-btn {
+        width: 30px;
+        height: 30px;
+        display: inline-grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 8px;
+        color: #555a56;
+        font-size: 13px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .15s, color .15s, border-color .15s;
+    }
+
+        .act-btn:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        .act-btn.danger:hover {
+            background: var(--rose-soft);
+            color: var(--rose-ink);
+            border-color: #ecd2cb;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 48px 16px;
+        color: var(--muted);
+        font-size: 13px;
+    }
+
+        .empty-state i {
+            display: block;
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #b9bdb8;
+        }
+
+    /* ---------- Modal ---------- */
+    .msg-modal .modal-content {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    .msg-modal .modal-header {
+        border-bottom: 1px solid var(--line);
+        padding: 18px 22px;
+    }
+
+    .msg-modal .modal-footer {
+        border-top: 1px solid var(--line);
+        padding: 14px 22px;
+    }
+
+    .msg-modal .modal-body {
+        padding: 20px 22px;
+    }
+
+    .m-subject {
+        font-size: 17px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .m-meta {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+        font-size: 12px;
+        color: var(--muted);
+        flex-wrap: wrap;
+    }
+
+        .m-meta strong {
+            color: var(--ink);
+            font-size: 13px;
+        }
+
+    .m-body {
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        font-size: 13px;
+        line-height: 1.65;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 320px;
+        overflow-y: auto;
+    }
+
+    .btn-soft,
+    .btn-reply,
+    .btn-del {
+        border-radius: 9px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px 16px;
+        text-decoration: none;
+        border: 1px solid var(--line);
+        cursor: pointer;
+    }
+
+    .btn-soft {
+        background: var(--surface);
+        color: var(--ink);
+    }
+
+        .btn-soft:hover {
+            background: var(--bg);
+        }
+
+    .btn-reply {
+        background: var(--green);
+        border-color: var(--green);
+        color: #fff;
+    }
+
+        .btn-reply:hover {
+            background: #75927b;
+            color: #fff;
+        }
+
+    .btn-del {
+        background: var(--rose-soft);
+        border-color: #ecd2cb;
+        color: var(--rose-ink);
+    }
+
+        .btn-del:hover {
+            background: #efd8d1;
+            color: var(--rose-ink);
+        }
+
+    @@media (max-width: 720px) {
+        .msg-row {
+            grid-template-columns: 40px 1fr auto;
+            row-gap: 6px;
+        }
+
+        .msg-date {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .msg-actions {
+            grid-column: 3;
+            grid-row: 1;
+        }
+
+        .search-box input {
+            width: 100%;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .email {
+            display: none;
+        }
+    }
+</style>
+
+<div class="inbox">
+
+    <p class="intro">İletişim formundan gelen mesajlar. Satıra tıklayarak mesajı açabilirsiniz.</p>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="stat-icon total"><i class="bi bi-inbox"></i></div>
+            <div>
+                <div class="stat-label">Toplam Mesaj</div>
+                <div class="stat-value" id="statTotal">@toplam</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon unread"><i class="bi bi-envelope-exclamation"></i></div>
+            <div>
+                <div class="stat-label">Okunmamış</div>
+                <div class="stat-value" id="statUnread">@okunmamis</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon read"><i class="bi bi-envelope-open"></i></div>
+            <div>
+                <div class="stat-label">Okunmuş</div>
+                <div class="stat-value" id="statRead">@okunmus</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="inbox-card">
+        <div class="inbox-tools">
+            <div class="tabs" role="tablist">
+                <button type="button" class="tab active" data-filter="all">Tümü <span class="count" id="countAll">@toplam</span></button>
+                <button type="button" class="tab" data-filter="unread">Okunmamış <span class="count" id="countUnread">@okunmamis</span></button>
+                <button type="button" class="tab" data-filter="read">Okundu <span class="count" id="countRead">@okunmus</span></button>
+            </div>
+
+            <div class="tools-right">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="msgSearch" placeholder="Gönderen veya konuya göre ara..." />
+                </div>
+                <button type="button" class="sort-btn" id="sortBtn">
+                    <i class="bi bi-sort-down" id="sortIcon"></i>
+                    <span id="sortText">En yeni üstte</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="msgList">
+            @foreach (var item in mesajlar)
+            {
+                var ilkHarf = string.IsNullOrWhiteSpace(item.NameSurname)
+                    ? "?"
+                    : item.NameSurname.Trim().Substring(0, 1).ToUpper();
+
+                <div class="msg-row @(item.IsRead ? "" : "is-unread")"
+                     data-id="@item.MessageId"
+                     data-name="@item.NameSurname"
+                     data-email="@item.Email"
+                     data-subject="@item.Subject"
+                     data-body="@item.MessageDetail"
+                     data-date="@item.SendDate.ToString("dd.MM.yyyy HH:mm")"
+                     data-ts="@(((DateTimeOffset)item.SendDate).ToUnixTimeSeconds())"
+                     data-read="@(item.IsRead ? "true" : "false")">
+
+                    <div class="avatar">@ilkHarf</div>
+
+                    <button type="button" class="msg-main js-open" aria-label="@item.NameSurname mesajını aç">
+                        <span class="msg-top">
+                            <span class="sender">@item.NameSurname</span>
+                            <span class="email">@item.Email</span>
+                            <span class="chip">@(item.IsRead ? "Okundu" : "Yeni")</span>
+                        </span>
+                        <span class="subject-line d-block">
+                            @item.Subject
+                            @if (!string.IsNullOrWhiteSpace(item.MessageDetail))
+                            {
+                                <span class="preview"> — @item.MessageDetail</span>
+                            }
+                        </span>
+                    </button>
+
+                    <div class="msg-date">@item.SendDate.ToString("dd.MM.yyyy HH:mm")</div>
+
+                    <div class="msg-actions">
+                        <button type="button" class="act-btn js-open" title="Mesajı aç"><i class="bi bi-eye"></i></button>
+                        <a href="/Admin/Message/DeleteMessage/@item.MessageId" class="act-btn danger js-delete" title="Sil">
+                            <i class="bi bi-trash3"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="empty-state" id="emptyState" style="@(mesajlar.Any() ? "display:none;" : "")">
+            <i class="bi bi-inbox"></i>
+            <span id="emptyText">@(mesajlar.Any() ? "Bu filtreyle eşleşen mesaj yok." : "Gelen kutunuz boş. Yeni mesajlar burada görünecek.")</span>
+        </div>
+    </div>
 </div>
+
+<!-- Mesaj detay modalı -->
+<div class="modal fade msg-modal" id="msgModal" tabindex="-1" aria-labelledby="mSubject" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="m-subject" id="mSubject"></h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <div class="m-meta">
+                    <strong id="mName"></strong>
+                    <span id="mEmail"></span>
+                    <span id="mDate"></span>
+                </div>
+                <div class="m-body" id="mBody"></div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn-del js-delete" id="mDelete"><i class="bi bi-trash3 me-1"></i>Sil</a>
+                <button type="button" class="btn-soft" data-bs-dismiss="modal">Kapat</button>
+                <a href="#" class="btn-reply" id="mReply"><i class="bi bi-reply me-1"></i>Yanıtla</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        (function () {
+            var list = document.getElementById('msgList');
+            var rows = Array.prototype.slice.call(list.querySelectorAll('.msg-row'));
+            var searchInput = document.getElementById('msgSearch');
+            var sortBtn = document.getElementById('sortBtn');
+            var sortIcon = document.getElementById('sortIcon');
+            var sortText = document.getElementById('sortText');
+            var emptyState = document.getElementById('emptyState');
+            var emptyText = document.getElementById('emptyText');
+            var tabs = document.querySelectorAll('.tab');
+            var modalEl = document.getElementById('msgModal');
+
+            var state = { filter: 'all', desc: true, q: '' };
+
+            /* ---------- Sayaçlar ---------- */
+            function refreshCounts() {
+                var unread = rows.filter(function (r) { return r.dataset.read === 'false'; }).length;
+                document.getElementById('statUnread').textContent = unread;
+                document.getElementById('statRead').textContent = rows.length - unread;
+                document.getElementById('countUnread').textContent = unread;
+                document.getElementById('countRead').textContent = rows.length - unread;
+                document.getElementById('countAll').textContent = rows.length;
+            }
+
+            /* ---------- Filtre, arama, sıralama ---------- */
+            function apply() {
+                var q = state.q.toLowerCase();
+
+                rows.sort(function (a, b) {
+                    var d = Number(a.dataset.ts) - Number(b.dataset.ts);
+                    return state.desc ? -d : d;
+                }).forEach(function (r) { list.appendChild(r); });
+
+                var visible = 0;
+                rows.forEach(function (r) {
+                    var isRead = r.dataset.read === 'true';
+                    var okFilter = state.filter === 'all' ||
+                        (state.filter === 'read' && isRead) ||
+                        (state.filter === 'unread' && !isRead);
+                    var hay = (r.dataset.name + ' ' + r.dataset.subject + ' ' + r.dataset.email).toLowerCase();
+                    var ok = okFilter && (!q || hay.indexOf(q) > -1);
+                    r.style.display = ok ? '' : 'none';
+                    if (ok) visible++;
+                });
+
+                if (rows.length === 0) {
+                    emptyState.style.display = '';
+                } else {
+                    emptyState.style.display = visible === 0 ? '' : 'none';
+                    emptyText.textContent = 'Bu filtreyle eşleşen mesaj yok.';
+                }
+            }
+
+            searchInput.addEventListener('input', function () {
+                state.q = searchInput.value.trim();
+                apply();
+            });
+
+            tabs.forEach(function (t) {
+                t.addEventListener('click', function () {
+                    tabs.forEach(function (x) { x.classList.remove('active'); });
+                    t.classList.add('active');
+                    state.filter = t.dataset.filter;
+                    apply();
+                });
+            });
+
+            sortBtn.addEventListener('click', function () {
+                state.desc = !state.desc;
+                sortText.textContent = state.desc ? 'En yeni üstte' : 'En eski üstte';
+                sortIcon.className = state.desc ? 'bi bi-sort-down' : 'bi bi-sort-up';
+                apply();
+            });
+
+            /* ---------- Mesajı aç (Bootstrap Modal) ---------- */
+            function markAsRead(row) {
+                if (row.dataset.read === 'true') return;
+
+                fetch('/Admin/Message/MarkAsRead/' + row.dataset.id, { method: 'POST' })
+                    .then(function (res) {
+                        if (!res.ok) return;
+                        row.dataset.read = 'true';
+                        row.classList.remove('is-unread');
+                        var chip = row.querySelector('.chip');
+                        if (chip) chip.textContent = 'Okundu';
+                        refreshCounts();
+                        apply();
+                    });
+            }
+
+            function openMessage(row) {
+                document.getElementById('mSubject').textContent = row.dataset.subject;
+                document.getElementById('mName').textContent = row.dataset.name;
+                document.getElementById('mEmail').textContent = row.dataset.email;
+                document.getElementById('mDate').textContent = row.dataset.date;
+                document.getElementById('mBody').textContent = row.dataset.body;
+
+                document.getElementById('mDelete').setAttribute('href', '/Admin/Message/DeleteMessage/' + row.dataset.id);
+                document.getElementById('mReply').setAttribute('href',
+                    'mailto:' + row.dataset.email + '?subject=' + encodeURIComponent('Re: ' + row.dataset.subject));
+
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                markAsRead(row);
+            }
+
+            list.addEventListener('click', function (e) {
+                var opener = e.target.closest('.js-open');
+                if (!opener) return;
+                openMessage(opener.closest('.msg-row'));
+            });
+
+            /* ---------- Silme onayı (SweetAlert2) ---------- */
+            document.addEventListener('click', function (e) {
+                var del = e.target.closest('.js-delete');
+                if (!del) return;
+                e.preventDefault();
+
+                var href = del.getAttribute('href');
+
+                Swal.fire({
+                    title: 'Mesaj silinsin mi?',
+                    text: 'Bu işlem geri alınamaz.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Evet, sil',
+                    cancelButtonText: 'Vazgeç',
+                    confirmButtonColor: '#b4584a',
+                    cancelButtonColor: '#86a08b',
+                    reverseButtons: true
+                }).then(function (result) {
+                    if (result.isConfirmed) window.location.href = href;
+                });
+            });
+
+            /* ---------- İşlem sonucu bildirimi (TempData) ---------- */
+            var flash = @Json.Serialize(TempData["Success"]?.ToString() ?? "");
+            if (flash) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: flash,
+                    showConfirmButton: false,
+                    timer: 2600,
+                    timerProgressBar: true
+                });
+            }
+
+            apply();
+        })();
+    </script>
+}

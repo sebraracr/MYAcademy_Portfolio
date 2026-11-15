@@ -1,31 +1,256 @@
 ﻿@model MYAcademy_Portfolio.Entities.Experience
 @{
-    ViewData["Title"] = "CreateExperience";
-    Layout = null;
+    ViewData["Title"] = "Yeni Deneyim Ekle";
+    Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
 }
-<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-<form method="post">
-<div class="container">
-    <br />
-    <label>Başlık</label>
-    <input type="text" asp-for="Title" class="form-control" />
-    <br />
-    <label>Şirket Adı</label>
-    <input type="text" asp-for="CompanyName" class="form-control" />
-    <br />
-    <label>Açıklama</label>
-    <input type="text" asp-for="Description" class="form-control" />
-    <br />
-    <label>Alt Başlık</label>
-    <input type="text" asp-for="SideTitle" class="form-control" />
-    <br />
-    <label>Çalışma Zamanı</label>
-    <input type="text" asp-for="Duration" class="form-control" />
-    <br />
-    <label>Çalışma Türü</label>
-    <input type="text" asp-for="WorkType" class="form-control" />
-    <br />
 
-    <button class="btn btn-info">Deneyimi Kaydet</button>
+<style>
+    .exp-form {
+        --bg: #f4f3ef;
+        --surface: #fffefb;
+        --line: #ebe8df;
+        --ink: #1f2421;
+        --muted: #7b807c;
+        --green: #86a08b;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: var(--ink);
+        width: 100%;
+    }
+
+        .exp-form .intro {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 18px;
+        }
+
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 20px;
+    }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+    .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .field .hint {
+        font-weight: 400;
+        color: var(--muted);
+    }
+
+    .field input[type="text"],
+    .field textarea,
+    .field select {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 13px;
+        padding: 10px 12px;
+        color: var(--ink);
+    }
+
+    .field textarea {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            outline: 2px solid var(--green);
+            outline-offset: 1px;
+            background: #fff;
+        }
+
+    .status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 10px 14px;
+    }
+
+        .status-box .status-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+            .status-box .status-text small {
+                display: block;
+                font-weight: 400;
+                font-size: 11px;
+                color: var(--muted);
+            }
+
+    .switch {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+        .switch input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            margin: 0;
+            z-index: 1;
+        }
+
+        .switch .track {
+            position: absolute;
+            inset: 0;
+            background: #d6d4cb;
+            border-radius: 999px;
+            transition: background .2s;
+        }
+
+            .switch .track::after {
+                content: "";
+                position: absolute;
+                top: 3px;
+                left: 3px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #fff;
+                transition: transform .2s;
+            }
+
+        .switch input:checked + .track {
+            background: var(--green);
+        }
+
+            .switch input:checked + .track::after {
+                transform: translateX(18px);
+            }
+
+        .switch input:focus-visible + .track {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+        }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+    }
+
+    .btn-cancel,
+    .btn-save {
+        border-radius: 10px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        background: var(--surface);
+        color: var(--ink);
+        border: 1px solid var(--line);
+    }
+
+        .btn-cancel:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+    .btn-save {
+        background: var(--green);
+        color: #fff;
+        border: 0;
+    }
+
+        .btn-save:hover {
+            background: #75927b;
+        }
+
+    @@media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="exp-form">
+    <p class="intro">Portfolyo sitenizde görünecek yeni deneyimi buradan ekleyebilirsiniz.</p>
+
+    <form method="post" class="form-card">
+        <div class="form-grid">
+
+            <div class="field full">
+                <label for="Title">Başlık</label>
+                <input type="text" asp-for="Title" placeholder="Örn: .NET Developer Stajyeri" />
+            </div>
+
+            <div class="field">
+                <label for="CompanyName">Kurum / Şirket</label>
+                <input type="text" asp-for="CompanyName" placeholder="Örn: Aselsan" />
+            </div>
+
+            <div class="field">
+                <label for="SideTitle">Alt Başlık</label>
+                <input type="text" asp-for="SideTitle" />
+            </div>
+
+            <div class="field">
+                <label for="Duration">Çalışma Zamanı</label>
+                <input type="text" asp-for="Duration" placeholder="Örn: Ağustos 2023 - Eylül 2023" />
+            </div>
+
+            <div class="field">
+                <label for="WorkType">Çalışma Türü</label>
+                <input type="text" asp-for="WorkType" placeholder="Örn: Stajyer" />
+            </div>
+
+            <div class="field full">
+                <label for="Description">Açıklama</label>
+                <textarea asp-for="Description" placeholder="Bu deneyimde neler yaptığınızı kısaca anlatın."></textarea>
+            </div>
+
+            <div class="field full">
+                <div class="status-box">
+                    <div class="status-text">
+                        Yayında olsun
+                        <small>Kapalıysa kayıt pasif olarak eklenir.</small>
+                    </div>
+                    <label class="switch mb-0">
+                        <input type="checkbox" asp-for="IsActive" />
+                        <span class="track"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/Admin/Experience/ExperienceList" class="btn-cancel">Vazgeç</a>
+            <button type="submit" class="btn-save">Deneyimi Kaydet</button>
+        </div>
+    </form>
 </div>
-</form>

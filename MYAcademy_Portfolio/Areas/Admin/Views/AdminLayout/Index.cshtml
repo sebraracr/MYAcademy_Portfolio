@@ -1,15 +1,20 @@
 ﻿@{
     Layout = null;
 
-    // Breadcrumb için route bilgileri (örn: Admin / Deneyimler / DeneyimListesi)
+    // Breadcrumb için route bilgileri (örn: Admin / Deneyimler / Liste)
     var area = ViewContext.RouteData.Values["area"]?.ToString();
     var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
     var pageTitle = ViewData["Title"]?.ToString() ?? action;
 
+    // Breadcrumb'da görünecek Türkçe isimler (sayfa vermezse route adları kullanılır)
+    var crumbController = ViewData["CrumbController"]?.ToString() ?? controller;
+    var crumbAction = ViewData["CrumbAction"]?.ToString() ?? action;
+
     // Aktif menü kontrolü
     string Active(string ctrl) =>
         string.Equals(controller, ctrl, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+
 }
 <!DOCTYPE html>
 <html lang="tr">
@@ -46,7 +51,9 @@
                 --transition-base: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
-            * { box-sizing: border-box; }
+            * {
+                box-sizing: border-box;
+            }
 
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -64,8 +71,15 @@
                 letter-spacing: -0.02em;
             }
 
-            ::-webkit-scrollbar { width: 6px; height: 6px; }
-            ::-webkit-scrollbar-thumb { background: #cfd6e4; border-radius: 4px; }
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #cfd6e4;
+                border-radius: 4px;
+            }
 
             /* ========== SIDEBAR ========== */
             #sidebar-wrapper {
@@ -135,29 +149,40 @@
                 position: relative;
             }
 
-            .sidebar-link i { font-size: 1.05rem; color: rgba(220, 226, 245, 0.7); }
+                .sidebar-link i {
+                    font-size: 1.05rem;
+                    color: rgba(220, 226, 245, 0.7);
+                }
 
-            .sidebar-link:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
-            .sidebar-link:hover i { color: #fff; }
+                .sidebar-link:hover {
+                    color: #fff;
+                    background: rgba(255, 255, 255, 0.06);
+                }
 
-            .sidebar-link.active {
-                background-color: var(--sidebar-active);
-                color: #fff;
-                font-weight: 600;
-            }
+                    .sidebar-link:hover i {
+                        color: #fff;
+                    }
 
-            .sidebar-link.active i { color: #fff; }
+                .sidebar-link.active {
+                    background-color: var(--sidebar-active);
+                    color: #fff;
+                    font-weight: 600;
+                }
 
-            .sidebar-link.active::before {
-                content: '';
-                position: absolute;
-                left: -8px;
-                top: 6px;
-                bottom: 6px;
-                width: 4px;
-                border-radius: 4px;
-                background: #A294F9;
-            }
+                    .sidebar-link.active i {
+                        color: #fff;
+                    }
+
+                    .sidebar-link.active::before {
+                        content: '';
+                        position: absolute;
+                        left: -8px;
+                        top: 6px;
+                        bottom: 6px;
+                        width: 4px;
+                        border-radius: 4px;
+                        background: #A294F9;
+                    }
 
             .sidebar-user {
                 margin: 0 14px 14px;
@@ -223,7 +248,10 @@
                 transition: var(--transition-base);
             }
 
-            .nav-icon-btn:hover { background: var(--pastel-purple); color: var(--primary-accent); }
+                .nav-icon-btn:hover {
+                    background: var(--pastel-purple);
+                    color: var(--primary-accent);
+                }
 
             .nav-user-btn {
                 display: flex;
@@ -251,28 +279,45 @@
                 gap: 10px;
             }
 
-            .dropdown-item:hover { background: #F2F4F9; color: var(--primary-accent); }
+                .dropdown-item:hover {
+                    background: #F2F4F9;
+                    color: var(--primary-accent);
+                }
 
             /* ========== BREADCRUMB / PAGE HEADER ========== */
             .page-header {
                 padding: 22px 28px 0;
             }
 
-            .page-header h1 {
-                font-size: 1.35rem;
-                font-weight: 700;
-                margin: 0 0 4px;
-            }
+                .page-header h1 {
+                    font-size: 1.35rem;
+                    font-weight: 700;
+                    margin: 0 0 4px;
+                }
 
             .breadcrumb {
                 margin: 0;
                 font-size: 0.82rem;
             }
 
-            .breadcrumb-item a { color: var(--text-secondary); text-decoration: none; }
-            .breadcrumb-item a:hover { color: var(--primary-accent); }
-            .breadcrumb-item.active { color: var(--primary-accent); font-weight: 600; }
-            .breadcrumb-item + .breadcrumb-item::before { content: "/"; color: #C3CAD9; }
+            .breadcrumb-item a {
+                color: var(--text-secondary);
+                text-decoration: none;
+            }
+
+                .breadcrumb-item a:hover {
+                    color: var(--primary-accent);
+                }
+
+            .breadcrumb-item.active {
+                color: var(--primary-accent);
+                font-weight: 600;
+            }
+
+            .breadcrumb-item + .breadcrumb-item::before {
+                content: "/";
+                color: #C3CAD9;
+            }
 
             /* ========== CONTENT (RenderBody) ========== */
             .main-body-container {
@@ -281,20 +326,25 @@
                 min-width: 0;
             }
 
-            /* Eklenen sayfalardaki tablolar/formlar taşmasın */
-            .main-body-container .table { background: var(--card-bg); }
-            .main-body-container .table-responsive,
-            .main-body-container table { max-width: 100%; }
+                /* Eklenen sayfalardaki tablolar/formlar taşmasın */
+                .main-body-container .table {
+                    background: var(--card-bg);
+                }
+
+                .main-body-container .table-responsive,
+                .main-body-container table {
+                    max-width: 100%;
+                }
 
             .btn-primary {
                 background-color: var(--primary-accent);
                 border-color: var(--primary-accent);
             }
 
-            .btn-primary:hover, .btn-primary:focus {
-                background-color: var(--primary-accent-hover);
-                border-color: var(--primary-accent-hover);
-            }
+                .btn-primary:hover, .btn-primary:focus {
+                    background-color: var(--primary-accent-hover);
+                    border-color: var(--primary-accent-hover);
+                }
 
             .form-control:focus, .form-select:focus {
                 border-color: var(--primary-accent);
@@ -314,8 +364,14 @@
                 gap: 8px;
             }
 
-            .admin-footer a { color: var(--text-secondary); text-decoration: none; }
-            .admin-footer a:hover { color: var(--primary-accent); }
+                .admin-footer a {
+                    color: var(--text-secondary);
+                    text-decoration: none;
+                }
+
+                    .admin-footer a:hover {
+                        color: var(--primary-accent);
+                    }
 
             /* ========== MOBILE ========== */
             .sidebar-overlay {
@@ -327,10 +383,22 @@
             }
 
             @@media (max-width: 991.98px) {
-                #sidebar-wrapper { transform: translateX(-100%); }
-                body.sidebar-open #sidebar-wrapper { transform: translateX(0); }
-                body.sidebar-open .sidebar-overlay { display: block; }
-                #main-content-wrapper { margin-left: 0; }
+                #sidebar-wrapper {
+                    transform: translateX(-100%);
+                }
+
+                body.sidebar-open #sidebar-wrapper {
+                    transform: translateX(0);
+                }
+
+                body.sidebar-open .sidebar-overlay {
+                    display: block;
+                }
+
+                #main-content-wrapper {
+                    margin-left: 0;
+                }
+
                 .admin-navbar, .page-header, .main-body-container, .admin-footer {
                     padding-left: 16px;
                     padding-right: 16px;
@@ -360,24 +428,24 @@
             </a>
 
             <div class="nav-group-title">İçerik</div>
-            <a href="/Admin/About/Index" class="sidebar-link @Active("About")">
+            <a href="/Admin/About/AboutList" class="sidebar-link @Active("About")">
                 <i class="bi bi-person"></i><span>Hakkımda</span>
             </a>
-            <a href="/Admin/Education/Index" class="sidebar-link @Active("Education")">
+            <a href="/Admin/Education/EducationList" class="sidebar-link @Active("Education")">
                 <i class="bi bi-mortarboard"></i><span>Eğitim</span>
             </a>
-            <a href="/Admin/Deneyimler/DeneyimListesi" class="sidebar-link @Active("Deneyimler")">
+            <a href="/Admin/Experience/ExperienceList" class="sidebar-link @Active("Experience")">
                 <i class="bi bi-briefcase"></i><span>Deneyimler</span>
             </a>
-            <a href="/Admin/Skill/Index" class="sidebar-link @Active("Skill")">
+            <a href="/Admin/Skill/SkillList" class="sidebar-link @Active("Skill")">
                 <i class="bi bi-code-slash"></i><span>Yetenekler</span>
             </a>
-            <a href="/Admin/Project/Index" class="sidebar-link @Active("Project")">
+            <a href="/Admin/Project/ProjectList" class="sidebar-link @Active("Project")">
                 <i class="bi bi-grid"></i><span>Projeler</span>
             </a>
 
             <div class="nav-group-title">İletişim & Sistem</div>
-            <a href="/Admin/Message/Index" class="sidebar-link @Active("Message")">
+            <a href="/Admin/Message/MessageList" class="sidebar-link @Active("Message")">
                 <i class="bi bi-envelope"></i><span>Mesajlar</span>
             </a>
             <a href="/Admin/Setting/Index" class="sidebar-link @Active("Setting")">
@@ -418,8 +486,8 @@
 
                 <div class="dropdown">
                     <button class="nav-user-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="user-avatar">MY</div>
-                        <span class="fw-semibold d-none d-md-inline" style="font-size: 0.85rem;">Murat Yücedağ</span>
+                        <div class="user-avatar">SEA</div>
+                        <span class="fw-semibold d-none d-md-inline" style="font-size: 0.85rem;">Sara Ebrar Acar</span>
                         <i class="bi bi-chevron-down small text-secondary d-none d-md-inline"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -435,22 +503,6 @@
         <!-- BREADCRUMB / URL -->
         <div class="page-header">
             <h1>@pageTitle</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    @if (!string.IsNullOrEmpty(area))
-                    {
-                        <li class="breadcrumb-item"><a href="/@area"><i class="bi bi-house-door me-1"></i>@area</a></li>
-                    }
-                    @if (!string.IsNullOrEmpty(controller))
-                    {
-                        <li class="breadcrumb-item"><a href="@(string.IsNullOrEmpty(area) ? "" : "/" + area)/@controller">@controller</a></li>
-                    }
-                    @if (!string.IsNullOrEmpty(action))
-                    {
-                        <li class="breadcrumb-item active" aria-current="page">@action</li>
-                    }
-                </ol>
-            </nav>
         </div>
 
         <!-- CONTENT -->
@@ -460,7 +512,7 @@
 
         <!-- FOOTER -->
         <footer class="admin-footer">
-            <span>© @DateTime.Now.Year Poyraz. Portfolio Admin — Tüm hakları saklıdır.</span>
+            <span>© @DateTime.Now.Year Sara Ebrar. Portfolio Admin — Tüm hakları saklıdır.</span>
             <span>
                 <a href="/" target="_blank">Siteyi Görüntüle</a>
                 <span class="mx-2">•</span>
@@ -479,5 +531,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
-

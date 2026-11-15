@@ -7,7 +7,7 @@
         public string? SubTitle { get; set; }
         public string Description { get; set; }
         public string Duration { get; set; }
-
+        public bool IsActive { get; set; } 
 
 
         //Altları neden yeşil ile çizilmiş? Null geçilemediği için.

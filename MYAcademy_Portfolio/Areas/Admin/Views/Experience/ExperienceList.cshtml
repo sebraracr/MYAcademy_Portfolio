@@ -1,34 +1,471 @@
 ﻿@model List<MYAcademy_Portfolio.Entities.Experience>
 @{
-    ViewData["Title"] = "ExperienceList";
+    ViewData["Title"] = "Deneyimlerim Listesi";
+    ViewData["CrumbController"] = "Deneyimler";
+    ViewData["CrumbAction"] = "Liste";
     Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
-}
-<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-<div class="container">
-    <br /><br />
-    <table class="table table-bordered">
-        <tr>
-            <th>#</th>
-            <th>Başlık</th>
-            <th>Şirket Adı</th>
-            <th>Açıklama</th>
-            <th>Alt Başlık</th>
-            <th>Tarih</th>
-            <th>Durum</th>
-        </tr>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.ExperienceId</td>
-                <td>@item.Title</td>
-                <td>@item.SideTitle</td>
-                <td>@item.Duration</td>
-                <td>@item.IsActive</td>
-                <td><a href="/Admin/Experience/DeleteExperience/@item.ExperienceId" class="btn btn-danger">Sil</a></td>
-                <td><a href="/Admin/Experience/UpdateExperience/@item.ExperienceId" class="btn btn-success">Güncelle</a></td>
-                
-                </tr>
-        }    
-    </table>
+    var toplam = Model.Count;
+    var aktif = Model.Count(x => x.IsActive);
+    var pasif = toplam - aktif;
+    int a = 0;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+<style>
+    .exp-page {
+        --bg: #f4f3ef;
+        --surface: #fffefb;
+        --line: #ebe8df;
+        --ink: #1f2421;
+        --muted: #7b807c;
+        --green: #86a08b;
+        --green-soft: #e3ece5;
+        --blue-soft: #e4edf6;
+        --rose-soft: #f4e6e1;
+        --rose-ink: #b4584a;
+        --ok-ink: #3f7a52;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: var(--ink);
+        padding: 24px;
+    }
+
+    .exp-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+    }
+
+        .exp-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .exp-header p {
+            margin: 2px 0 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+    .btn-new {
+        background: var(--green);
+        color: #fff;
+        border: 0;
+        border-radius: 10px;
+        padding: 9px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+        .btn-new:hover {
+            background: #75927b;
+            color: #fff;
+        }
+
+    .stat-row {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-bottom: 26px;
+    }
+
+    .stat-card {
+        flex: 0 1 280px;
+        min-width: 220px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        color: #5d7a64;
+    }
+
+        .stat-icon.total {
+            background: var(--green-soft);
+        }
+
+        .stat-icon.active {
+            background: var(--blue-soft);
+            color: #587a9c;
+        }
+
+        .stat-icon.passive {
+            background: var(--rose-soft);
+            color: #9a7a6c;
+        }
+
+    .stat-label {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 500;
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.15;
+    }
+
+    .list-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .list-tools {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 18px 16px;
+    }
+
+    .search-box {
+        position: relative;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .search-box input,
+        .list-tools select {
+            border: 1px solid var(--line);
+            background: var(--bg);
+            border-radius: 9px;
+            font-size: 12px;
+            padding: 8px 12px;
+            color: var(--ink);
+            font-family: inherit;
+        }
+
+        .search-box input {
+            padding-left: 32px;
+            width: 240px;
+        }
+
+            .search-box input:focus,
+            .list-tools select:focus {
+                outline: 2px solid var(--green);
+                outline-offset: 1px;
+            }
+
+    .exp-table-wrap {
+        overflow-x: auto;
+    }
+
+    table.exp-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 760px;
+    }
+
+    .exp-table thead th {
+        background: #faf9f5;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        padding: 12px 16px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+    }
+
+        .exp-table thead th:last-child,
+        .exp-table td.actions {
+            text-align: right;
+        }
+
+    .exp-table tbody td {
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .exp-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .exp-table tbody tr:hover {
+        background: #faf9f4;
+    }
+
+    .row-id {
+        font-weight: 600;
+    }
+
+    .title-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .title-icon {
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+        border-radius: 9px;
+        background: #efede6;
+        display: grid;
+        place-items: center;
+        color: #6b6f6b;
+        font-size: 14px;
+    }
+
+    .title-main {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .title-sub {
+        font-size: 11px;
+        color: var(--muted);
+        max-width: 340px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .company {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-weight: 500;
+    }
+
+        .company i {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+    .badge-soft {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 500;
+        border-radius: 999px;
+        padding: 4px 11px;
+    }
+
+        .badge-soft::before {
+            content: "";
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+    .badge-active {
+        background: #e6f1e8;
+        color: var(--ok-ink);
+        border: 1px solid #cfe3d3;
+    }
+
+    .badge-passive {
+        background: var(--rose-soft);
+        color: var(--rose-ink);
+        border: 1px solid #ecd2cb;
+    }
+
+    .act-btn {
+        width: 30px;
+        height: 30px;
+        display: inline-grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 8px;
+        color: #555a56;
+        font-size: 13px;
+        text-decoration: none;
+        margin-left: 4px;
+        transition: background .15s, color .15s, border-color .15s;
+    }
+
+        .act-btn:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        .act-btn.danger:hover {
+            background: var(--rose-soft);
+            color: var(--rose-ink);
+            border-color: #ecd2cb;
+        }
+
+    .empty-row td {
+        text-align: center;
+        color: var(--muted);
+        padding: 36px 16px !important;
+    }
+</style>
+
+<div class="exp-page">
+
+    <div class="exp-header">
+        <div>
+            <p>Portfolyo sitenizde yer alacak deneyim içeriklerini buradan yönetebilirsiniz.</p>
+        </div>
+        
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="stat-icon total"><i class="bi bi-briefcase"></i></div>
+            <div>
+                <div class="stat-label">Toplam Deneyim</div>
+                <div class="stat-value">@toplam</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon active"><i class="bi bi-check2-circle"></i></div>
+            <div>
+                <div class="stat-label">Aktif Kayıt</div>
+                <div class="stat-value">@aktif</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon passive"><i class="bi bi-pause-circle"></i></div>
+            <div>
+                <div class="stat-label">Pasif Kayıt</div>
+                <div class="stat-value">@pasif</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-card">
+        <div class="list-tools">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="expSearch" placeholder="Başlık veya şirkete göre ara..." />
+            </div>
+            <select id="expStatus">
+                <option value="">Durum (Tümü)</option>
+                <option value="aktif">Aktif</option>
+                <option value="pasif">Pasif</option>
+            </select>
+        </div>
+
+        <div class="exp-table-wrap">
+            <table class="exp-table" id="expTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Deneyim Başlığı</th>
+                        <th>Kurum / Şirket</th>
+                        <th>Süre</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        a++;
+                        <tr data-status="@(item.IsActive ? "aktif" : "pasif")">
+                            <td class="row-id">#@a</td>
+                            <td>
+                                <div class="title-cell">
+                                    <div class="title-icon"><i class="bi bi-laptop"></i></div>
+                                    <div>
+                                        <div class="title-main">@item.Title</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="company"><i class="bi bi-building"></i>@item.SideTitle</span>
+                            </td>
+                            <td>@item.Duration</td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge-soft badge-active">Aktif</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-soft badge-passive">Pasif</span>
+                                }
+                            </td>
+                            <td class="actions">
+                                <a href="/Admin/Experience/UpdateExperience/@item.ExperienceId" class="act-btn" title="Güncelle">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="/Admin/Experience/DeleteExperience/@item.ExperienceId" class="act-btn danger" title="Sil"
+                                   onclick="return confirm('Bu deneyimi silmek istediğinize emin misiniz?');">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    <tr class="empty-row" id="expEmpty" style="display:none;">
+                        <td colspan="6">Aramanızla eşleşen deneyim bulunamadı.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+    <br />
+        <a href="/Admin/Experience/CreateExperience" class="btn-new">
+            <i class="bi bi-plus-circle-fill"></i> Yeni Deneyim Ekle
+        </a>
+
+
 </div>
+
+<script>
+    (function () {
+        var search = document.getElementById('expSearch');
+        var status = document.getElementById('expStatus');
+        var rows = document.querySelectorAll('#expTable tbody tr[data-status]');
+        var empty = document.getElementById('expEmpty');
+
+        function filter() {
+            var q = search.value.trim().toLowerCase();
+            var s = status.value;
+            var visible = 0;
+
+            rows.forEach(function (row) {
+                var text = row.innerText.toLowerCase();
+                var ok = (!q || text.indexOf(q) > -1) && (!s || row.dataset.status === s);
+                row.style.display = ok ? '' : 'none';
+                if (ok) visible++;
+            });
+
+            empty.style.display = visible === 0 ? '' : 'none';
+        }
+
+        search.addEventListener('input', filter);
+        status.addEventListener('change', filter);
+    })();
+</script>

@@ -180,6 +180,9 @@ namespace MYAcademy_Portfolio.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("SubTitle")
                         .HasColumnType("nvarchar(max)");
 
@@ -271,25 +274,29 @@ namespace MYAcademy_Portfolio.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
                     b.Property<string>("MessageDetail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("NameSurname")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("SendDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Subject")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.HasKey("MessageId");
 
@@ -402,6 +409,21 @@ namespace MYAcademy_Portfolio.Migrations
                     b.ToTable("SocialMedias");
                 });
 
+            modelBuilder.Entity("ProjectSkill", b =>
+                {
+                    b.Property<int>("ProjectsProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SkillsSkillId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProjectsProjectId", "SkillsSkillId");
+
+                    b.HasIndex("SkillsSkillId");
+
+                    b.ToTable("ProjectSkill");
+                });
+
             modelBuilder.Entity("ExperienceSkill", b =>
                 {
                     b.HasOne("MYAcademy_Portfolio.Entities.Experience", null)
@@ -437,6 +459,21 @@ namespace MYAcademy_Portfolio.Migrations
                         .IsRequired();
 
                     b.Navigation("SkillCategory");
+                });
+
+            modelBuilder.Entity("ProjectSkill", b =>
+                {
+                    b.HasOne("MYAcademy_Portfolio.Entities.Project", null)
+                        .WithMany()
+                        .HasForeignKey("ProjectsProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MYAcademy_Portfolio.Entities.Skill", null)
+                        .WithMany()
+                        .HasForeignKey("SkillsSkillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MYAcademy_Portfolio.Entities.Category", b =>

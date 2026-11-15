@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<MYAcademy_Portfolio.Entities.Message>
+@{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
 
@@ -7,6 +8,7 @@
     int unreadCount = ViewBag.messageReadByFalseCount ?? 0;
     int readPercent = total > 0 ? (int)Math.Round(readCount * 100.0 / total) : 0;
     int unreadPercent = total > 0 ? 100 - readPercent : 0;
+    int count = 0;
 }
 
 <style>
@@ -470,43 +472,64 @@
             <table class="dash-table">
                 <thead>
                     <tr>
-                        <th>Gönderen</th>
-                        <th>Konu</th>
-                        <th>Tarih</th>
-                        <th>Durum</th>
+                        <th scope="col">#</th>
+                        <th scope="col">Gönderen</th>
+                        <th scope="col">Mail</th>
+                        <th scope="col">Konu</th>
+                        <th scope="col">Mesaj</th>
+                        <th scope="col">Tarih</th>
+                        <th scope="col">Durum</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><div class="name-cell"><span class="avatar">AY</span><div>Ahmet Yılmaz<div class="muted">ahmet@ornek.com</div></div></div></td>
-                        <td>Proje teklifi hakkında</td>
-                        <td class="muted">06.11.2026</td>
-                        <td><span class="badge badge-unread">Okunmadı</span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="name-cell"><span class="avatar">EK</span><div>Elif Kaya<div class="muted">elif@ornek.com</div></div></div></td>
-                        <td>Web sitesi tasarımı</td>
-                        <td class="muted">05.11.2026</td>
-                        <td><span class="badge badge-unread">Okunmadı</span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="name-cell"><span class="avatar">MD</span><div>Mehmet Demir<div class="muted">mehmet@ornek.com</div></div></div></td>
-                        <td>İş birliği önerisi</td>
-                        <td class="muted">03.11.2026</td>
-                        <td><span class="badge badge-read">Okundu</span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="name-cell"><span class="avatar">ZÇ</span><div>Zeynep Çelik<div class="muted">zeynep@ornek.com</div></div></div></td>
-                        <td>Teşekkür mesajı</td>
-                        <td class="muted">01.11.2026</td>
-                        <td><span class="badge badge-read">Okundu</span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="name-cell"><span class="avatar">BA</span><div>Burak Aksoy<div class="muted">burak@ornek.com</div></div></div></td>
-                        <td>Freelance iş talebi</td>
-                        <td class="muted">29.10.2026</td>
-                        <td><span class="badge badge-read">Okundu</span></td>
-                    </tr>
+                    @foreach (var item in Model)
+                    {
+                        count++;
+
+                        <tr>
+                            <td>@count</td>
+                            <td>
+                                <div class="name-cell">
+                                    <span class="avatar">
+                                        @item.NameSurname
+                                    </span>
+
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <div class="muted">@item.Email</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <div class="muted">@item.Subject</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <div class="muted">@item.MessageDetail</div>
+                                </div>
+                            </td>
+
+                            
+
+                            <td class="muted">
+                                @item.SendDate.ToString("dd.MM.yyyy")
+                            </td>
+
+                            <td>
+                                @if (item.IsRead)
+                                {
+                                    <span class="badge badge-read">Okundu</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-unread">Okunmadı</span>
+                                }
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
@@ -517,7 +540,7 @@
         <div class="dash-card">
             <h3>Son Aktiviteler</h3>
             <ul class="activity">
-                <li><span class="dot" style="background:#4f46e5"></span><div>Yeni bir proje eklendi: <b>E-Ticaret Sitesi</b><span class="time">2 saat önce</span></div></li>
+                <li><span class="dot" style="background:#4f46e5"></span><div>Yeni bir proje eklendi: <b>Enneagram Kişilik Analizi</b><span class="time">2 saat önce</span></div></li>
                 <li><span class="dot" style="background:#10b981"></span><div>Hakkımda bölümü güncellendi<span class="time">Dün</span></div></li>
                 <li><span class="dot" style="background:#f59e0b"></span><div>Yeni yetenek eklendi: <b>ASP.NET Core</b><span class="time">3 gün önce</span></div></li>
                 <li><span class="dot" style="background:#0284c7"></span><div>Deneyim bilgileri düzenlendi<span class="time">1 hafta önce</span></div></li>
@@ -527,16 +550,19 @@
         <div class="dash-card">
             <h3>Hızlı Erişim</h3>
             <div class="quick-links">
-                <a href="#">📁 Projeler</a>
-                <a href="#">🛠 Yetenekler</a>
-                <a href="#">💼 Deneyimler</a>
-                <a href="#">🎓 Eğitim</a>
-                <a href="#">👤 Hakkımda</a>
-                <a href="#">✉ Mesajlar</a>
+                <a href="/Default/Index/">🌼 Siteye Git</a>
+                <a href="/Skill/SkillList/">🛠 Yetenekler</a>
+                <a href="/Experience/ExperienceList/">💼 Deneyimler</a>
+                <a href="/Portfolio/PortfolioList/">📁 Projeler</a>
+                <a href="/About/AboutList/">👤 Hakkımda</a>
+                <a href="/Message/Inbox/">✉ Mesajlar</a>
             </div>
         </div>
     </div>
 
 </div>
+
+
+
 
 

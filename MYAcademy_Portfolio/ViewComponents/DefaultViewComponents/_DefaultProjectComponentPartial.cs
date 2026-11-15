@@ -13,7 +13,7 @@ namespace MYAcademy_Portfolio.ViewComponents.DefaultViewComponents
         }
         public IViewComponentResult Invoke()
         {
-            var values = _context.Projects.Include(p => p.Category).ToList();
+            var values = _context.Projects.Include(p => p.Category).Include(p => p.Skills).ToList();
             return View(values);
         }
     }

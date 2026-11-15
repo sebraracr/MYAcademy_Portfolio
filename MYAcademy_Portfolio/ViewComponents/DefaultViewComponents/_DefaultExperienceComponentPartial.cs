@@ -14,10 +14,12 @@ namespace MYAcademy_Portfolio.ViewComponents.DefaultViewComponents
         public IViewComponentResult Invoke()
         {
             var values = _context.Experiences
-         .Include(x => x.Skills)
-         .Where(x => x.IsActive)
-         .OrderByDescending(x => x.Duration)
-         .ToList();
+    .Include(x => x.Skills)
+    .Where(x => x.IsActive)
+    .AsEnumerable()
+    .OrderByDescending(x => System.Text.RegularExpressions.Regex
+        .Match(x.Duration ?? "", @"\b\d{4}\b").Value)
+    .ToList();
 
             return View(values);
 

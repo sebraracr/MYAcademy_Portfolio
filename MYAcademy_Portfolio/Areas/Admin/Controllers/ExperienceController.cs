@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MYAcademy_Portfolio.Context;
 using MYAcademy_Portfolio.Entities;
-
+using MYAcademy_Portfolio.Helpers;
 namespace MYAcademy_Portfolio.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -16,7 +16,11 @@ namespace MYAcademy_Portfolio.Areas.Admin.Controllers
 
         public IActionResult ExperienceList()
         {
-            var values = _context.Experiences.ToList();
+            var values = _context.Experiences
+                .ToList()
+                .OrderByDescending(x => DurationHelper.EndYear(x.Duration))
+                .ThenByDescending(x => DurationHelper.StartYear(x.Duration))
+                .ToList();
             return View(values);
         }
         [HttpGet]
