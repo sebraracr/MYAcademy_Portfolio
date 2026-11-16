@@ -481,7 +481,7 @@
                 });
             });
 
-            // İşlem sonucu bildirimi (TempData)
+            // İşlem sonucu bildirimi (TempData) — başarılı
             var flash = @Json.Serialize(TempData["Success"]?.ToString() ?? "");
             if (flash) {
                 Swal.fire({
@@ -494,6 +494,21 @@
                     timerProgressBar: true
                 });
             }
+
+            // İşlem sonucu bildirimi (TempData) — hata
+            var flashError = @Json.Serialize(TempData["Error"]?.ToString() ?? "");
+            if (flashError) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: flashError,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+
         })();
     </script>
 }

@@ -1,0 +1,647 @@
+﻿@model List<MYAcademy_Portfolio.Entities.Project>
+@{
+    ViewData["Title"] = "Projelerim";
+    Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
+
+    var projeler = Model;
+    var toplam = projeler.Count;
+    var aktif = projeler.Count(x => x.IsActive);
+    var pasif = toplam - aktif;
+
+    // Filtre için: projelerde kullanılan kategoriler (tekrarsız)
+    var kategoriler = projeler
+        .Where(x => x.Category != null)
+        .Select(x => x.Category)
+        .DistinctBy(x => x.CategoryId)
+        .OrderBy(x => x.CategoryName)
+        .ToList();
+
+    int count = 0;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+    .prj-page {
+        --bg: #f4f3ef;
+        --surface: #fffefb;
+        --line: #ebe8df;
+        --ink: #1f2421;
+        --muted: #7b807c;
+        --green: #86a08b;
+        --green-soft: #e3ece5;
+        --blue-soft: #e4edf6;
+        --rose-soft: #f4e6e1;
+        --rose-ink: #b4584a;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: var(--ink);
+        padding: 24px;
+    }
+
+    .prj-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+    }
+
+        .prj-header p {
+            margin: 2px 0 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+    .btn-new {
+        background: var(--green);
+        color: #fff;
+        border: 0;
+        border-radius: 10px;
+        padding: 9px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+        .btn-new:hover {
+            background: #75927b;
+            color: #fff;
+        }
+
+    /* İstatistik kartları */
+    .stat-row {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+    }
+
+    .stat-card {
+        flex: 0 1 240px;
+        min-width: 200px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+    }
+
+        .stat-icon.total {
+            background: var(--blue-soft);
+            color: #587a9c;
+        }
+
+        .stat-icon.active {
+            background: var(--green-soft);
+            color: #5d7a64;
+        }
+
+        .stat-icon.passive {
+            background: var(--rose-soft);
+            color: #9a7a6c;
+        }
+
+    .stat-label {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 500;
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.15;
+    }
+
+    /* Liste kartı */
+    .list-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .list-tools {
+        padding: 18px 16px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .search-box {
+        position: relative;
+        display: inline-block;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .search-box input,
+        .list-tools select {
+            border: 1px solid var(--line);
+            background: var(--bg);
+            border-radius: 9px;
+            font-size: 12px;
+            padding: 8px 12px;
+            color: var(--ink);
+            font-family: inherit;
+        }
+
+        .search-box input {
+            padding-left: 32px;
+            width: 280px;
+            max-width: 100%;
+        }
+
+            .search-box input:focus,
+            .list-tools select:focus {
+                outline: 2px solid var(--green);
+                outline-offset: 1px;
+            }
+
+    .prj-table-wrap {
+        overflow-x: auto;
+    }
+
+    table.prj-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+
+    .prj-table thead th {
+        background: #faf9f5;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        padding: 12px 16px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+    }
+
+        .prj-table thead th:last-child,
+        .prj-table td.actions {
+            text-align: right;
+        }
+
+    .prj-table tbody td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .prj-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .prj-table tbody tr:hover {
+        background: #faf9f4;
+    }
+
+    .row-id {
+        font-weight: 600;
+    }
+
+    .project-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 260px;
+    }
+
+    .project-thumb {
+        width: 64px;
+        height: 42px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid var(--line);
+        background: var(--bg);
+    }
+
+    .project-thumb-empty {
+        width: 64px;
+        height: 42px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: var(--bg);
+        border: 1px dashed var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+    }
+
+    .project-title {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .project-desc {
+        font-size: 11px;
+        color: var(--muted);
+        max-width: 280px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .project-github {
+        font-size: 11px;
+        color: var(--muted);
+        text-decoration: none;
+    }
+
+        .project-github:hover {
+            color: var(--ink);
+        }
+
+    .cat-badge {
+        display: inline-block;
+        background: #eeeafe;
+        color: #6a5ec4;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        max-width: 280px;
+    }
+
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+        .tag i {
+            color: #2f8f5b;
+            font-size: 10px;
+        }
+
+        .tag.more {
+            background: #f1f0ea;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+    .tag-none {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    /* Aktif / Pasif etiketi */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+        .status-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-badge.active {
+            background: var(--green-soft);
+            color: #3f6a4c;
+        }
+
+        .status-badge.passive {
+            background: var(--rose-soft);
+            color: var(--rose-ink);
+        }
+
+    .act-btn {
+        width: 30px;
+        height: 30px;
+        display: inline-grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 8px;
+        color: #555a56;
+        font-size: 13px;
+        text-decoration: none;
+        margin-left: 4px;
+        transition: background .15s, color .15s, border-color .15s;
+    }
+
+        .act-btn:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        .act-btn.danger:hover {
+            background: var(--rose-soft);
+            color: var(--rose-ink);
+            border-color: #ecd2cb;
+        }
+
+    .empty-row td {
+        text-align: center;
+        color: var(--muted);
+        padding: 36px 16px !important;
+    }
+</style>
+
+<div class="prj-page">
+
+    <div class="prj-header">
+        <div>
+            <p>Portfolyo sitenizdeki projeleri buradan ekleyebilir, düzenleyebilir ve yayından kaldırabilirsiniz.</p>
+        </div>
+        <a href="/Admin/Project/CreateProject" class="btn-new">
+            <i class="bi bi-plus-circle-fill"></i> Yeni Proje Ekle
+        </a>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="stat-icon total"><i class="bi bi-grid"></i></div>
+            <div>
+                <div class="stat-label">Toplam Proje</div>
+                <div class="stat-value">@toplam</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon active"><i class="bi bi-eye"></i></div>
+            <div>
+                <div class="stat-label">Yayında</div>
+                <div class="stat-value">@aktif</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon passive"><i class="bi bi-eye-slash"></i></div>
+            <div>
+                <div class="stat-label">Pasif</div>
+                <div class="stat-value">@pasif</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-card">
+        <div class="list-tools">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="prjSearch" placeholder="Proje adı veya yetenek ara..." />
+            </div>
+            <select id="prjCategory" aria-label="Kategoriye göre filtrele">
+                <option value="">Tüm kategoriler</option>
+                @foreach (var kat in kategoriler)
+                {
+                    <option value="@kat.CategoryId">@kat.CategoryName</option>
+                }
+            </select>
+            <select id="prjStatus" aria-label="Duruma göre filtrele">
+                <option value="">Tüm durumlar</option>
+                <option value="active">Yayında</option>
+                <option value="passive">Pasif</option>
+            </select>
+        </div>
+
+        <div class="prj-table-wrap">
+            <table class="prj-table" id="prjTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Proje</th>
+                        <th>Kategori</th>
+                        <th>Yetenekler</th>
+                        <th>Durum</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in projeler)
+                    {
+                        count++;
+                        var yetenekler = (item.Skills ?? new List<MYAcademy_Portfolio.Entities.Skill>())
+                            .OrderBy(s => s.Name)
+                            .ToList();
+                        var kalan = yetenekler.Count - 4;
+
+                        <tr data-row
+                            data-category="@item.CategoryId"
+                            data-status="@(item.IsActive ? "active" : "passive")">
+                            <td class="row-id">@count</td>
+                            <td>
+                                <div class="project-cell">
+                                    @if (!string.IsNullOrWhiteSpace(item.CoverImageUrl))
+                                    {
+                                        <img src="@item.CoverImageUrl" alt="@item.Title" class="project-thumb" />
+                                    }
+                                    else
+                                    {
+                                        <div class="project-thumb-empty"><i class="bi bi-image"></i></div>
+                                    }
+                                    <div>
+                                        <div class="project-title">@item.Title</div>
+                                        <div class="project-desc">@item.Description</div>
+                                        @if (!string.IsNullOrWhiteSpace(item.GithubUrl))
+                                        {
+                                            <a href="@item.GithubUrl" target="_blank" rel="noopener" class="project-github">
+                                                <i class="bi bi-github"></i> GitHub
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="cat-badge">@(item.Category?.CategoryName ?? "Kategorisiz")</span>
+                            </td>
+                            <td>
+                                @if (yetenekler.Any())
+                                {
+                                    <div class="tag-list">
+                                        @foreach (var skill in yetenekler.Take(4))
+                                        {
+                                            <span class="tag"><i class="bi bi-check2"></i>@skill.Name</span>
+                                        }
+                                        @if (kalan > 0)
+                                        {
+                                            <span class="tag more">+@kalan daha</span>
+                                        }
+                                    </div>
+                                    <span hidden>@string.Join(" ", yetenekler.Select(s => s.Name))</span>
+                                }
+                                else
+                                {
+                                    <span class="tag-none">—</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="status-badge active">Yayında</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge passive">Pasif</span>
+                                }
+                            </td>
+                            <td class="actions">
+                                <a href="/Admin/Project/UpdateProject/@item.ProjectId" class="act-btn" title="Güncelle">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="/Admin/Project/DeleteProject/@item.ProjectId" class="act-btn danger js-delete"
+                                   data-title="@item.Title" title="Sil">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    <tr class="empty-row" id="prjEmpty" style="@(projeler.Any() ? "display:none;" : "")">
+                        <td colspan="6">@(projeler.Any() ? "Filtreyle eşleşen proje bulunamadı." : "Henüz proje eklenmedi.")</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        (function () {
+            var search = document.getElementById('prjSearch');
+            var catSelect = document.getElementById('prjCategory');
+            var statusSelect = document.getElementById('prjStatus');
+            var rows = document.querySelectorAll('#prjTable tbody tr[data-row]');
+            var empty = document.getElementById('prjEmpty');
+
+            // Türkçe karakterleri sadeleştirir: İ, I, ı → i | ğ → g | ş → s ...
+            function normalize(text) {
+                return (text || '')
+                    .toLocaleLowerCase('tr-TR')
+                    .replace(/ı/g, 'i')
+                    .normalize('NFD')
+                    .replace(/[̀-ͯ]/g, '');
+            }
+
+            var index = [];
+            rows.forEach(function (row) {
+                index.push({ row: row, text: normalize(row.textContent) });
+            });
+
+            // Arama + kategori + durum filtresi birlikte çalışır
+            function applyFilters() {
+                var q = normalize(search.value.trim());
+                var cat = catSelect.value;
+                var status = statusSelect.value;
+                var visible = 0;
+
+                index.forEach(function (item) {
+                    var ok = (!q || item.text.indexOf(q) > -1)
+                        && (!cat || item.row.dataset.category === cat)
+                        && (!status || item.row.dataset.status === status);
+                    item.row.style.display = ok ? '' : 'none';
+                    if (ok) visible++;
+                });
+
+                if (rows.length > 0) {
+                    empty.style.display = visible === 0 ? '' : 'none';
+                }
+            }
+
+            search.addEventListener('input', applyFilters);
+            catSelect.addEventListener('change', applyFilters);
+            statusSelect.addEventListener('change', applyFilters);
+
+            // Silme onayı (SweetAlert2)
+            document.addEventListener('click', function (e) {
+                var del = e.target.closest('.js-delete');
+                if (!del) return;
+                e.preventDefault();
+
+                var href = del.getAttribute('href');
+                Swal.fire({
+                    title: 'Proje silinsin mi?',
+                    text: '"' + del.dataset.title + '" kalıcı olarak silinecek. Bu işlem geri alınamaz.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Evet, sil',
+                    cancelButtonText: 'Vazgeç',
+                    confirmButtonColor: '#b4584a',
+                    cancelButtonColor: '#86a08b',
+                    reverseButtons: true
+                }).then(function (result) {
+                    if (result.isConfirmed) window.location.href = href;
+                });
+            });
+
+            // İşlem sonucu bildirimi (TempData) — başarılı
+            var flash = @Json.Serialize(TempData["Success"]?.ToString() ?? "");
+            if (flash) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: flash,
+                    showConfirmButton: false,
+                    timer: 2600,
+                    timerProgressBar: true
+                });
+            }
+
+            // İşlem sonucu bildirimi (TempData) — hata
+            var flashError = @Json.Serialize(TempData["Error"]?.ToString() ?? "");
+            if (flashError) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: flashError,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        })();
+    </script>
+}

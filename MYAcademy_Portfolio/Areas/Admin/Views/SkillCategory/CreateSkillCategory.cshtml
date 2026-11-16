@@ -1,0 +1,415 @@
+﻿@model MYAcademy_Portfolio.Areas.Admin.Models.SkillCategoryFormViewModel
+@{
+    ViewData["Title"] = "Yeni Yetenek Kategorisi Ekle";
+    Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
+}
+
+<style>
+    .exp-form {
+        --bg: #f4f3ef;
+        --surface: #fffefb;
+        --line: #ebe8df;
+        --ink: #1f2421;
+        --muted: #7b807c;
+        --green: #86a08b;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: var(--ink);
+        width: 100%;
+    }
+
+        .exp-form .intro {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 18px;
+        }
+
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 20px;
+    }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+    .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .field .hint {
+        font-weight: 400;
+        color: var(--muted);
+    }
+
+    .field input[type="text"],
+    .field textarea,
+    .field select {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 13px;
+        padding: 10px 12px;
+        color: var(--ink);
+    }
+
+    .field textarea {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            outline: 2px solid var(--green);
+            outline-offset: 1px;
+            background: #fff;
+        }
+
+    .status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 10px 14px;
+    }
+
+        .status-box .status-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+            .status-box .status-text small {
+                display: block;
+                font-weight: 400;
+                font-size: 11px;
+                color: var(--muted);
+            }
+
+    .switch {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+        .switch input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            margin: 0;
+            z-index: 1;
+        }
+
+        .switch .track {
+            position: absolute;
+            inset: 0;
+            background: #d6d4cb;
+            border-radius: 999px;
+            transition: background .2s;
+        }
+
+            .switch .track::after {
+                content: "";
+                position: absolute;
+                top: 3px;
+                left: 3px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #fff;
+                transition: transform .2s;
+            }
+
+        .switch input:checked + .track {
+            background: var(--green);
+        }
+
+            .switch input:checked + .track::after {
+                transform: translateX(18px);
+            }
+
+        .switch input:focus-visible + .track {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+        }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+    }
+
+    .btn-cancel,
+    .btn-save {
+        border-radius: 10px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        background: var(--surface);
+        color: var(--ink);
+        border: 1px solid var(--line);
+    }
+
+        .btn-cancel:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+    .btn-save {
+        background: var(--green);
+        color: #fff;
+        border: 0;
+    }
+
+        .btn-save:hover {
+            background: #75927b;
+        }
+
+    @@media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .field-error {
+        display: block;
+        font-size: 12px;
+        color: #b4584a;
+        margin-top: 5px;
+    }
+
+    .tag-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 8px 10px;
+        min-height: 46px;
+    }
+
+        .tag-box:focus-within {
+            outline: 2px solid var(--green);
+            outline-offset: 1px;
+            background: #fff;
+        }
+
+    .skill-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 4px 8px;
+        font-size: 12.5px;
+        font-weight: 600;
+    }
+
+        .skill-tag .bi-check2 {
+            color: var(--green);
+        }
+
+        .skill-tag button {
+            border: 0;
+            background: none;
+            padding: 0;
+            line-height: 1;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+            .skill-tag button:hover {
+                color: #b4584a;
+            }
+
+    .tag-box input {
+        flex: 1;
+        min-width: 160px;
+        border: 0 !important;
+        outline: 0 !important;
+        background: transparent !important;
+        padding: 4px !important;
+        font-size: 13px;
+    }
+
+    .btn-add-skill {
+        border: 0;
+        background: var(--green);
+        color: #fff;
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .btn-add-skill:hover {
+            background: #75927b;
+        }
+</style>
+
+<div class="exp-form">
+    <p class="intro">Yeni bir yetenek kategorisi ve içindeki yetenekleri buradan ekleyebilirsiniz.</p>
+
+    <form method="post" class="form-card" id="categoryForm">
+        @Html.AntiForgeryToken()
+
+        <div class="form-grid">
+            <div class="field">
+                <label asp-for="Name">Kategori Adı</label>
+                <input type="text" asp-for="Name" placeholder="Örn: Backend Development" />
+                <span asp-validation-for="Name" class="field-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Icon">İkon <span class="hint">(Bootstrap Icons)</span></label>
+                <input type="text" asp-for="Icon" placeholder="Örn: bi-code-slash" />
+                <span asp-validation-for="Icon" class="field-error"></span>
+            </div>
+
+            <div class="field full">
+                <label asp-for="Description">Açıklama</label>
+                <textarea asp-for="Description" placeholder="Bu kategoride neler yaptığınızı kısaca anlatın."></textarea>
+                <span asp-validation-for="Description" class="field-error"></span>
+            </div>
+
+            <!-- YETENEKLER: etiket kutusu -->
+            <div class="field full">
+                <label for="skillInput">Yetenekler <span class="hint">— listeden seçin ya da yazıp Ekle'ye basın</span></label>
+                <div class="tag-box" id="tagBox">
+                    @* Hata sonrası form geri gelirse, önceden eklenen etiketler kaybolmasın *@
+                    @foreach (var ad in Model.SkillNames)
+                    {
+                        <span class="skill-tag">
+                            <i class="bi bi-check2"></i>@ad
+                            <button type="button" class="tag-remove" aria-label="Kaldır">&times;</button>
+                            <input type="hidden" name="SkillNames" value="@ad" />
+                        </span>
+                    }
+                    <input type="text" id="skillInput" list="skillSuggestions" placeholder="Seçin veya yazın..." autocomplete="off" />
+                    <datalist id="skillSuggestions">
+
+                        @foreach (var oneri in Model.SuggestedSkills)
+                        {
+                            <option value="@oneri"></option>
+                        }
+                    </datalist>
+                    <button type="button" class="btn-add-skill" id="addSkillBtn">
+                        <i class="bi bi-plus-lg"></i> Ekle
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/Admin/SkillCategory/SkillCategoryList" class="btn-cancel">Vazgeç</a>
+            <button type="submit" class="btn-save">Kategoriyi Kaydet</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    (function () {
+        var box = document.getElementById('tagBox');
+        var input = document.getElementById('skillInput');
+
+        // Zaten eklenmiş mi? (büyük/küçük harf fark etmez)
+        function varMi(ad) {
+            var mevcut = box.querySelectorAll('input[name="SkillNames"]');
+            return Array.from(mevcut).some(function (h) {
+                return h.value.toLowerCase() === ad.toLowerCase();
+            });
+        }
+
+        // Yeni etiket oluştur: görünen kısım + gizli input
+        function etiketEkle(ad) {
+            ad = ad.trim();
+            if (!ad || varMi(ad)) return;
+
+            var tag = document.createElement('span');
+            tag.className = 'skill-tag';
+            tag.innerHTML = '<i class="bi bi-check2"></i>' +
+                '<button type="button" class="tag-remove" aria-label="Kaldır">&times;</button>';
+            tag.insertBefore(document.createTextNode(ad), tag.querySelector('button'));
+
+            var hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = 'SkillNames';
+            hidden.value = ad;
+            tag.appendChild(hidden);
+
+            box.insertBefore(tag, input);
+        }
+
+        // Enter veya virgül → etiket ekle (formu göndermesin)
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                etiketEkle(input.value);
+                input.value = '';
+            }
+            // Kutu boşken Backspace → son etiketi sil
+            if (e.key === 'Backspace' && input.value === '') {
+                var tags = box.querySelectorAll('.skill-tag');
+                if (tags.length) tags[tags.length - 1].remove();
+            }
+        });
+
+        // ⭐ YENİ: Dropdown'dan bir öneri seçilince direkt etiket yap
+        input.addEventListener('input', function (e) {
+            if (e.inputType === 'insertReplacementText' || e.inputType === undefined) {
+                etiketEkle(input.value);
+                input.value = '';
+            }
+        });
+
+        // "Ekle" butonu → kutudaki yazıyı etiket yap
+        document.getElementById('addSkillBtn').addEventListener('click', function () {
+            etiketEkle(input.value);
+            input.value = '';
+            input.focus();
+        });
+
+        // ✕ butonu → etiketi sil
+        box.addEventListener('click', function (e) {
+            var btn = e.target.closest('.tag-remove');
+            if (btn) btn.closest('.skill-tag').remove();
+            else if (!e.target.closest('#addSkillBtn')) input.focus();
+        });
+
+        // Kaydet'e basarken kutuda yazılı kalan bir şey varsa onu da ekle
+        document.getElementById('categoryForm').addEventListener('submit', function () {
+            etiketEkle(input.value);
+        });
+    })();
+</script>
