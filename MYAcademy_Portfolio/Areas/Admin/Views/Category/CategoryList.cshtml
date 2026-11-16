@@ -1,0 +1,586 @@
+﻿@model List<MYAcademy_Portfolio.Entities.Category>
+@{
+    ViewData["Title"] = "Proje Kategorileri";
+    Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
+
+    var toplam = Model.Count;
+    var toplamProje = Model.Sum(x => x.Projects?.Count ?? 0);
+    var bos = Model.Count(x => x.Projects == null || !x.Projects.Any());
+    int count = 0;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+    .cat-page {
+        --bg: #f4f3ef;
+        --surface: #fffefb;
+        --line: #ebe8df;
+        --ink: #1f2421;
+        --muted: #7b807c;
+        --green: #86a08b;
+        --green-soft: #e3ece5;
+        --blue-soft: #e4edf6;
+        --rose-soft: #f4e6e1;
+        --rose-ink: #b4584a;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: var(--ink);
+        padding: 24px;
+    }
+
+    .cat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+    }
+
+        .cat-header p {
+            margin: 2px 0 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+    .btn-new {
+        background: var(--green);
+        color: #fff;
+        border: 0;
+        border-radius: 10px;
+        padding: 9px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+        .btn-new:hover {
+            background: #75927b;
+            color: #fff;
+        }
+
+    /* İstatistik kartları */
+    .stat-row {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+    }
+
+    .stat-card {
+        flex: 0 1 240px;
+        min-width: 200px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+    }
+
+        .stat-icon.total {
+            background: var(--blue-soft);
+            color: #587a9c;
+        }
+
+        .stat-icon.active {
+            background: var(--green-soft);
+            color: #5d7a64;
+        }
+
+        .stat-icon.passive {
+            background: var(--rose-soft);
+            color: #9a7a6c;
+        }
+
+    .stat-label {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 500;
+    }
+
+    .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.15;
+    }
+
+    /* Liste kartı */
+    .list-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .list-tools {
+        padding: 18px 16px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .search-box {
+        position: relative;
+        display: inline-block;
+    }
+
+        .search-box i {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .search-box input,
+        .list-tools select {
+            border: 1px solid var(--line);
+            background: var(--bg);
+            border-radius: 9px;
+            font-size: 12px;
+            padding: 8px 12px;
+            color: var(--ink);
+            font-family: inherit;
+        }
+
+        .search-box input {
+            padding-left: 32px;
+            width: 280px;
+            max-width: 100%;
+        }
+
+            .search-box input:focus,
+            .list-tools select:focus {
+                outline: 2px solid var(--green);
+                outline-offset: 1px;
+            }
+
+    .cat-table-wrap {
+        overflow-x: auto;
+    }
+
+    table.cat-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+
+    .cat-table thead th {
+        background: #faf9f5;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        padding: 12px 16px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+    }
+
+        .cat-table thead th:last-child,
+        .cat-table td.actions {
+            text-align: right;
+        }
+
+    .cat-table tbody td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .cat-table tbody tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .cat-table tbody tr:hover {
+        background: #faf9f4;
+    }
+
+    .row-id {
+        font-weight: 600;
+    }
+
+    .project-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 260px;
+    }
+
+    .project-thumb {
+        width: 64px;
+        height: 42px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid var(--line);
+        background: var(--bg);
+    }
+
+    .project-thumb-empty {
+        width: 64px;
+        height: 42px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: var(--bg);
+        border: 1px dashed var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+    }
+
+    .project-title {
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .project-desc {
+        font-size: 11px;
+        color: var(--muted);
+        max-width: 280px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .project-github {
+        font-size: 11px;
+        color: var(--muted);
+        text-decoration: none;
+    }
+
+        .project-github:hover {
+            color: var(--ink);
+        }
+
+    .cat-badge {
+        display: inline-block;
+        background: #eeeafe;
+        color: #6a5ec4;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        max-width: 280px;
+    }
+
+    .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+        .tag i {
+            color: #2f8f5b;
+            font-size: 10px;
+        }
+
+        .tag.more {
+            background: #f1f0ea;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+    .tag-none {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    /* Aktif / Pasif etiketi */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+        .status-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-badge.active {
+            background: var(--green-soft);
+            color: #3f6a4c;
+        }
+
+        .status-badge.passive {
+            background: var(--rose-soft);
+            color: var(--rose-ink);
+        }
+
+    .act-btn {
+        width: 30px;
+        height: 30px;
+        display: inline-grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        border-radius: 8px;
+        color: #555a56;
+        font-size: 13px;
+        text-decoration: none;
+        margin-left: 4px;
+        transition: background .15s, color .15s, border-color .15s;
+    }
+
+        .act-btn:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        .act-btn.danger:hover {
+            background: var(--rose-soft);
+            color: var(--rose-ink);
+            border-color: #ecd2cb;
+        }
+
+    .empty-row td {
+        text-align: center;
+        color: var(--muted);
+        padding: 36px 16px !important;
+    }
+</style>
+
+<style>
+    .count-badge {
+        display: inline-block;
+        min-width: 28px;
+        text-align: center;
+        background: var(--green-soft);
+        color: #3f6a4c;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+        .count-badge.zero {
+            background: #f1f0ea;
+            color: var(--muted);
+        }
+
+    .cat-name {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+    }
+
+        .cat-name .icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: #eeeafe;
+            color: #8276d9;
+            display: grid;
+            place-items: center;
+        }
+</style>
+
+<div class="cat-page">
+
+    <div class="cat-header">
+        <div>
+            <p>Proje formundaki kategori seçenekleri ve sitedeki proje filtreleri bu listeden gelir.</p>
+        </div>
+        <a href="/Admin/Category/CreateCategory" class="btn-new">
+            <i class="bi bi-plus-circle-fill"></i> Yeni Kategori Ekle
+        </a>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-card">
+            <div class="stat-icon total"><i class="bi bi-folder2"></i></div>
+            <div>
+                <div class="stat-label">Toplam Kategori</div>
+                <div class="stat-value">@toplam</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon active"><i class="bi bi-grid"></i></div>
+            <div>
+                <div class="stat-label">Toplam Proje</div>
+                <div class="stat-value">@toplamProje</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon passive"><i class="bi bi-folder-x"></i></div>
+            <div>
+                <div class="stat-label">Boş Kategori</div>
+                <div class="stat-value">@bos</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-card">
+        <div class="list-tools">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" id="catSearch" placeholder="Kategori adına göre ara..." />
+            </div>
+        </div>
+
+        <div class="cat-table-wrap">
+            <table class="cat-table" id="catTable" style="min-width:560px;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Kategori</th>
+                        <th>Proje Sayısı</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        count++;
+                        var projeSayisi = item.Projects?.Count ?? 0;
+                        <tr data-row>
+                            <td class="row-id">@count</td>
+                            <td>
+                                <div class="cat-name">
+                                    <span class="icon"><i class="bi bi-folder2"></i></span>
+                                    @item.CategoryName
+                                </div>
+                            </td>
+                            <td>
+                                <span class="count-badge @(projeSayisi == 0 ? "zero" : "")">@projeSayisi</span>
+                            </td>
+                            <td class="actions">
+                                <a href="/Admin/Category/UpdateCategory/@item.CategoryId" class="act-btn" title="Güncelle">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="/Admin/Category/DeleteCategory/@item.CategoryId" class="act-btn danger js-delete"
+                                   data-name="@item.CategoryName" data-count="@projeSayisi" title="Sil">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    <tr class="empty-row" id="catEmpty" style="@(Model.Any() ? "display:none;" : "")">
+                        <td colspan="4">@(Model.Any() ? "Aramanızla eşleşen kategori bulunamadı." : "Henüz kategori eklenmedi.")</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        (function () {
+            var search = document.getElementById('catSearch');
+            var rows = document.querySelectorAll('#catTable tbody tr[data-row]');
+            var empty = document.getElementById('catEmpty');
+
+            function normalize(text) {
+                return (text || '')
+                    .toLocaleLowerCase('tr-TR')
+                    .replace(/ı/g, 'i')
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '');
+            }
+
+            search.addEventListener('input', function () {
+                var q = normalize(search.value.trim());
+                var visible = 0;
+                rows.forEach(function (row) {
+                    var ok = !q || normalize(row.textContent).indexOf(q) > -1;
+                    row.style.display = ok ? '' : 'none';
+                    if (ok) visible++;
+                });
+                if (rows.length > 0) empty.style.display = visible === 0 ? '' : 'none';
+            });
+
+            // Silme onayı — içinde proje varsa uyar, silme
+            document.addEventListener('click', function (e) {
+                var del = e.target.closest('.js-delete');
+                if (!del) return;
+                e.preventDefault();
+
+                var count = parseInt(del.dataset.count, 10) || 0;
+                if (count > 0) {
+                    Swal.fire({
+                        title: 'Bu kategori silinemez',
+                        text: '"' + del.dataset.name + '" kategorisinde ' + count + ' proje var. Önce projeleri başka bir kategoriye taşıyın.',
+                        icon: 'info',
+                        confirmButtonText: 'Tamam',
+                        confirmButtonColor: '#86a08b'
+                    });
+                    return;
+                }
+
+                var href = del.getAttribute('href');
+                Swal.fire({
+                    title: 'Kategori silinsin mi?',
+                    text: '"' + del.dataset.name + '" kalıcı olarak silinecek.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Evet, sil',
+                    cancelButtonText: 'Vazgeç',
+                    confirmButtonColor: '#b4584a',
+                    cancelButtonColor: '#86a08b',
+                    reverseButtons: true
+                }).then(function (result) {
+                    if (result.isConfirmed) window.location.href = href;
+                });
+            });
+
+            var flash = @Json.Serialize(TempData["Success"]?.ToString() ?? "");
+            if (flash) {
+                Swal.fire({
+                    toast: true, position: 'top-end', icon: 'success', title: flash,
+                    showConfirmButton: false, timer: 2600, timerProgressBar: true
+                });
+            }
+
+            var flashError = @Json.Serialize(TempData["Error"]?.ToString() ?? "");
+            if (flashError) {
+                Swal.fire({
+                    toast: true, position: 'top-end', icon: 'error', title: flashError,
+                    showConfirmButton: false, timer: 3500, timerProgressBar: true
+                });
+            }
+        })();
+    </script>
+}
