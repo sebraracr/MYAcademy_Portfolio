@@ -1,0 +1,471 @@
+﻿@model MYAcademy_Portfolio.Areas.Admin.Models.ProjectFormViewModel
+@{
+    ViewData["Title"] = "Yeni Proje Ekle";
+    Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
+}
+
+<style>
+    .exp-form {
+        --bg: #f4f3ef;
+        --surface: #fffefb;
+        --line: #ebe8df;
+        --ink: #1f2421;
+        --muted: #7b807c;
+        --green: #86a08b;
+        --green-soft: #e3ece5;
+        --rose-ink: #b4584a;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: var(--ink);
+        width: 100%;
+    }
+
+        .exp-form .intro {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 18px;
+        }
+
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 20px;
+    }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+    .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .field .hint {
+        font-weight: 400;
+        color: var(--muted);
+    }
+
+    .field input[type="text"],
+    .field input[type="url"],
+    .field textarea,
+    .field select {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 13px;
+        padding: 10px 12px;
+        color: var(--ink);
+    }
+
+    .field textarea {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            outline: 2px solid var(--green);
+            outline-offset: 1px;
+            background: #fff;
+        }
+
+    .field-error {
+        display: block;
+        font-size: 12px;
+        color: var(--rose-ink);
+        margin-top: 5px;
+    }
+
+    /* ── Yetenek seçimi: tıklanabilir çipler ── */
+    .skill-picker {
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .skill-picker-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+        .skill-picker-top input {
+            border: 1px solid var(--line) !important;
+            background: #fff !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            font-size: 12px !important;
+            width: 220px !important;
+        }
+
+    .skill-count {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+        .skill-count b {
+            color: var(--ink);
+        }
+
+    .skill-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-height: 190px;
+        overflow-y: auto;
+    }
+
+    .skill-chip {
+        position: relative;
+        margin: 0 !important;
+    }
+
+        .skill-chip input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .skill-chip span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s, border-color .15s, color .15s;
+        }
+
+            .skill-chip span:hover {
+                border-color: var(--green);
+            }
+
+            .skill-chip span i {
+                display: none;
+            }
+
+        .skill-chip input:checked + span {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+        }
+
+            .skill-chip input:checked + span i {
+                display: inline;
+            }
+
+        .skill-chip input:focus-visible + span {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+        }
+
+    /* ── Kapak görseli ── */
+    .image-box {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        border: 1px dashed var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .image-preview {
+        width: 140px;
+        height: 80px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        overflow: hidden;
+        font-size: 22px;
+    }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .image-box input[type="file"] {
+        font-size: 12px;
+    }
+
+    .image-box small {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    /* ── Yayında switch ── */
+    .status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 10px 14px;
+    }
+
+        .status-box .status-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+            .status-box .status-text small {
+                display: block;
+                font-weight: 400;
+                font-size: 11px;
+                color: var(--muted);
+            }
+
+    .switch {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+        .switch input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            margin: 0;
+            z-index: 1;
+        }
+
+        .switch .track {
+            position: absolute;
+            inset: 0;
+            background: #d6d4cb;
+            border-radius: 999px;
+            transition: background .2s;
+        }
+
+            .switch .track::after {
+                content: "";
+                position: absolute;
+                top: 3px;
+                left: 3px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #fff;
+                transition: transform .2s;
+            }
+
+        .switch input:checked + .track {
+            background: var(--green);
+        }
+
+            .switch input:checked + .track::after {
+                transform: translateX(18px);
+            }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+    }
+
+    .btn-cancel,
+    .btn-save {
+        border-radius: 10px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        background: var(--surface);
+        color: var(--ink);
+        border: 1px solid var(--line);
+    }
+
+        .btn-cancel:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+    .btn-save {
+        background: var(--green);
+        color: #fff;
+        border: 0;
+    }
+
+        .btn-save:hover {
+            background: #75927b;
+        }
+
+    @@media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .image-box {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="exp-form">
+    <p class="intro">Portfolyo sitenizde görünecek yeni bir projeyi buradan ekleyebilirsiniz.</p>
+
+    @* enctype="multipart/form-data" → dosya (görsel) gönderebilmek için ŞART *@
+    <form method="post" class="form-card" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label asp-for="Title">Proje Adı</label>
+                <input type="text" asp-for="Title" placeholder="Örn: Portfolyo Sitesi" />
+                <span asp-validation-for="Title" class="field-error"></span>
+            </div>
+
+            <!-- KATEGORİ: tek seçimli dropdown -->
+            <div class="field">
+                <label asp-for="CategoryId">Kategori</label>
+                <select asp-for="CategoryId" asp-items="Model.CategoryList">
+                    <option value="0">-- Kategori seçin --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="field-error"></span>
+            </div>
+
+            <div class="field full">
+                <label asp-for="Description">Açıklama</label>
+                <textarea asp-for="Description" placeholder="Projenin ne yaptığını kısaca anlatın."></textarea>
+                <span asp-validation-for="Description" class="field-error"></span>
+            </div>
+
+            <div class="field full">
+                <label asp-for="GithubUrl">GitHub Linki <span class="hint">(isteğe bağlı)</span></label>
+                <input type="url" asp-for="GithubUrl" placeholder="https://github.com/kullanici/proje" />
+                <span asp-validation-for="GithubUrl" class="field-error"></span>
+            </div>
+
+            <!-- YETENEKLER: çoklu seçim (her biri bir checkbox) -->
+            <div class="field full">
+                <label>Kullanılan Yetenekler</label>
+                <div class="skill-picker">
+                    <div class="skill-picker-top">
+                        <input type="text" id="skillFilter" placeholder="Yetenek ara..." autocomplete="off" />
+                        <span class="skill-count"><b id="skillCount">@Model.SelectedSkillIds.Count</b> seçildi</span>
+                    </div>
+                    <div class="skill-chips" id="skillChips">
+                        @foreach (var skill in Model.SkillList)
+                        {
+                            var secili = Model.SelectedSkillIds.Contains(int.Parse(skill.Value));
+                            <label class="skill-chip" data-name="@skill.Text.ToLower()">
+                                <input type="checkbox" name="SelectedSkillIds" value="@skill.Value" @(secili ? "checked" : "") />
+                                <span><i class="bi bi-check2"></i>@skill.Text</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- KAPAK GÖRSELİ -->
+            <div class="field full">
+                <label asp-for="CoverImage">Kapak Görseli <span class="hint">(JPG, PNG veya WEBP — en fazla 2 MB)</span></label>
+                <div class="image-box">
+                    <div class="image-preview" id="imagePreview"><i class="bi bi-image"></i></div>
+                    <div>
+                        <input type="file" asp-for="CoverImage" accept=".jpg,.jpeg,.png,.webp" />
+                        <small>Seçtiğiniz görsel solda önizlenir.</small>
+                    </div>
+                </div>
+                <span asp-validation-for="CoverImage" class="field-error"></span>
+            </div>
+
+            <div class="field full">
+                <div class="status-box">
+                    <div class="status-text">
+                        Yayında olsun
+                        <small>Kapalıysa proje sitede görünmez.</small>
+                    </div>
+                    <label class="switch mb-0">
+                        <input type="checkbox" asp-for="IsActive" />
+                        <span class="track"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/Admin/Project/ProjectList" class="btn-cancel">Vazgeç</a>
+            <button type="submit" class="btn-save">Projeyi Kaydet</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    (function () {
+        // ── Yetenek arama + seçili sayısı ──
+        var filter = document.getElementById('skillFilter');
+        var chips = document.querySelectorAll('#skillChips .skill-chip');
+        var countEl = document.getElementById('skillCount');
+
+        filter.addEventListener('input', function () {
+            var q = filter.value.trim().toLowerCase();
+            chips.forEach(function (chip) {
+                chip.style.display = !q || chip.dataset.name.indexOf(q) > -1 ? '' : 'none';
+            });
+        });
+
+        document.getElementById('skillChips').addEventListener('change', function () {
+            countEl.textContent = document.querySelectorAll('#skillChips input:checked').length;
+        });
+
+        // ── Görsel önizleme ──
+        var fileInput = document.getElementById('CoverImage');
+        var preview = document.getElementById('imagePreview');
+
+        fileInput.addEventListener('change', function () {
+            var file = fileInput.files[0];
+            if (!file) {
+                preview.innerHTML = '<i class="bi bi-image"></i>';
+                return;
+            }
+            var img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.alt = 'Önizleme';
+            preview.innerHTML = '';
+            preview.appendChild(img);
+        });
+    })();
+</script>
