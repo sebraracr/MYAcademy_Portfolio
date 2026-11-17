@@ -748,7 +748,12 @@
                 if (!opener) return;
                 openMessage(opener.closest('.msg-row'));
             });
-
+            // Dashboard'dan gelindiyse (?open=5) o mesajı otomatik aç
+            var acilacakId = new URLSearchParams(window.location.search).get('open');
+            if (acilacakId) {
+                var satir = rows.find(function (r) { return r.dataset.id === acilacakId; });
+                if (satir) openMessage(satir);
+            }
             /* ---------- Silme onayı (SweetAlert2) ---------- */
             document.addEventListener('click', function (e) {
                 var del = e.target.closest('.js-delete');

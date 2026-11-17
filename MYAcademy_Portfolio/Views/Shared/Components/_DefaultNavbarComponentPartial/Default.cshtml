@@ -41,15 +41,18 @@
             </ul>
 
             <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
-                <a href="@Url.Content("~/cv/Sara_Ebrar_Acar_CV-1.pdf")"
-                   class="btn-custom-primary"
-                   id="btnDownloadCv"
-                   download>
-                    <i class="bi bi-file-earmark-arrow-down"></i>
-                    CV İndir
-                </a>
+                @if (!string.IsNullOrWhiteSpace(ViewBag.CvUrl as string))
+                {
+                    <a href="@ViewBag.CvUrl"
+                       class="btn-custom-primary"
+                       id="btnDownloadCv"
+                       download="Sara_Ebrar_Acar_CV.pdf">
+                        <i class="bi bi-file-earmark-arrow-down"></i>
+                        CV İndir
+                    </a>
+                }
             </div>
         </div>
     </div>
-</div>
+
 </nav>

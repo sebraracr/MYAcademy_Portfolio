@@ -1,0 +1,628 @@
+﻿@model MYAcademy_Portfolio.Entities.HeroSection
+@{
+    ViewData["Title"] = "Ayarlar";
+    Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
+}
+
+<style>
+    .exp-form {
+        --bg: #f4f3ef;
+        --surface: #fffefb;
+        --line: #ebe8df;
+        --ink: #1f2421;
+        --muted: #7b807c;
+        --green: #86a08b;
+        --green-soft: #e3ece5;
+        --rose-ink: #b4584a;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: var(--ink);
+        width: 100%;
+    }
+
+        .exp-form .intro {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 18px;
+        }
+
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 20px;
+    }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+    .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .field .hint {
+        font-weight: 400;
+        color: var(--muted);
+    }
+
+    .field input[type="text"],
+    .field input[type="url"],
+    .field textarea,
+    .field select {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 13px;
+        padding: 10px 12px;
+        color: var(--ink);
+    }
+
+    .field textarea {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            outline: 2px solid var(--green);
+            outline-offset: 1px;
+            background: #fff;
+        }
+
+    .field-error {
+        display: block;
+        font-size: 12px;
+        color: var(--rose-ink);
+        margin-top: 5px;
+    }
+
+    /* ── Yetenek seçimi: tıklanabilir çipler ── */
+    .skill-picker {
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .skill-picker-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+        .skill-picker-top input {
+            border: 1px solid var(--line) !important;
+            background: #fff !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            font-size: 12px !important;
+            width: 220px !important;
+        }
+
+    .skill-count {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+        .skill-count b {
+            color: var(--ink);
+        }
+
+    .skill-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-height: 190px;
+        overflow-y: auto;
+    }
+
+    .skill-chip {
+        position: relative;
+        margin: 0 !important;
+    }
+
+        .skill-chip input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .skill-chip span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s, border-color .15s, color .15s;
+        }
+
+            .skill-chip span:hover {
+                border-color: var(--green);
+            }
+
+            .skill-chip span i {
+                display: none;
+            }
+
+        .skill-chip input:checked + span {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+        }
+
+            .skill-chip input:checked + span i {
+                display: inline;
+            }
+
+        .skill-chip input:focus-visible + span {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+        }
+
+    /* ── Kapak görseli ── */
+    .image-box {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        border: 1px dashed var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .image-preview {
+        width: 140px;
+        height: 80px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        overflow: hidden;
+        font-size: 22px;
+    }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .image-box input[type="file"] {
+        font-size: 12px;
+    }
+
+    .image-box small {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    /* ── Yayında switch ── */
+    .status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 10px 14px;
+    }
+
+        .status-box .status-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+            .status-box .status-text small {
+                display: block;
+                font-weight: 400;
+                font-size: 11px;
+                color: var(--muted);
+            }
+
+    .switch {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+        .switch input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            margin: 0;
+            z-index: 1;
+        }
+
+        .switch .track {
+            position: absolute;
+            inset: 0;
+            background: #d6d4cb;
+            border-radius: 999px;
+            transition: background .2s;
+        }
+
+            .switch .track::after {
+                content: "";
+                position: absolute;
+                top: 3px;
+                left: 3px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #fff;
+                transition: transform .2s;
+            }
+
+        .switch input:checked + .track {
+            background: var(--green);
+        }
+
+            .switch input:checked + .track::after {
+                transform: translateX(18px);
+            }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+    }
+
+    .btn-cancel,
+    .btn-save {
+        border-radius: 10px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        background: var(--surface);
+        color: var(--ink);
+        border: 1px solid var(--line);
+    }
+
+        .btn-cancel:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+    .btn-save {
+        background: var(--green);
+        color: #fff;
+        border: 0;
+    }
+
+        .btn-save:hover {
+            background: #75927b;
+        }
+
+    @@media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .image-box {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 20px;
+    }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+    .field input[type="email"] {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 13px;
+        padding: 10px 12px;
+        color: var(--ink);
+    }
+
+        .field input[type="email"]:focus {
+            outline: 2px solid var(--green);
+            outline-offset: 1px;
+            background: #fff;
+        }
+
+    .field textarea {
+        min-height: 150px;
+    }
+
+    .char-count {
+        display: block;
+        text-align: right;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 4px;
+    }
+
+    .section-title-sm {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 4px 0 -4px;
+    }
+
+    @@media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .upload-row {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        border: 1px dashed var(--line);
+        background: var(--bg);
+        border-radius: 12px;
+        padding: 14px;
+    }
+
+    .avatar-preview {
+        width: 96px;
+        height: 96px;
+        flex-shrink: 0;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        font-size: 28px;
+    }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .cv-icon {
+        width: 56px;
+        height: 64px;
+        flex-shrink: 0;
+        border-radius: 10px;
+        background: #f4e6e1;
+        color: #b4584a;
+        display: grid;
+        place-items: center;
+        font-size: 26px;
+    }
+
+    .upload-info {
+        min-width: 0;
+    }
+
+        .upload-info .title {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .upload-info small {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .upload-info input[type="file"] {
+            font-size: 12px;
+            max-width: 100%;
+        }
+
+    .cv-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #4f6b55;
+        text-decoration: none;
+        margin-bottom: 8px;
+    }
+
+        .cv-link:hover {
+            text-decoration: underline;
+        }
+
+    .cv-empty {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 8px;
+    }
+
+    .new-file {
+        display: none;
+        font-size: 12px;
+        color: #4f6b55;
+        font-weight: 600;
+        margin-top: 6px;
+    }
+</style>
+
+<div class="exp-form">
+    <p class="intro">Sitenin ana sayfa bölümünü, profil fotoğrafınızı ve indirilebilir CV dosyanızı buradan yönetebilirsiniz.</p>
+
+    @* enctype: dosya (fotoğraf + CV) gönderebilmek için şart *@
+    <form method="post" class="form-card" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="form-grid">
+
+            <!-- ── ANA SAYFA YAZILARI ── -->
+            <div class="section-title-sm full">Ana Sayfa</div>
+
+            <div class="field">
+                <label asp-for="Title">Ad Soyad <span class="hint">— "Merhaba, Ben ..." kısmı</span></label>
+                <input type="text" asp-for="Title" placeholder="Örn: Sara Ebrar Acar" />
+                <span asp-validation-for="Title" class="field-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="SubTitle">Karşılama Yazısı <span class="hint">— üstteki küçük rozet</span></label>
+                <input type="text" asp-for="SubTitle" placeholder="Örn: Portföyüme hoş geldiniz" />
+                <span asp-validation-for="SubTitle" class="field-error"></span>
+            </div>
+
+            <div class="field full">
+                <label asp-for="Description">Tanıtım Yazısı</label>
+                <textarea asp-for="Description" maxlength="500" style="min-height:120px;"
+                          placeholder="Kendinizi birkaç cümleyle tanıtın."></textarea>
+                <span class="char-count"><span id="descCount">0</span> / 500</span>
+                <span asp-validation-for="Description" class="field-error"></span>
+            </div>
+
+            <!-- ── PROFİL FOTOĞRAFI ── -->
+            <div class="section-title-sm full">Profil Fotoğrafı</div>
+
+            <div class="field full">
+                <div class="upload-row">
+                    <div class="avatar-preview" id="avatarPreview">
+                        @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                        {
+                            <img src="@Model.ImageUrl" alt="Profil fotoğrafı" />
+                        }
+                        else
+                        {
+                            <i class="bi bi-person"></i>
+                        }
+                    </div>
+                    <div class="upload-info">
+                        <div class="title">Yeni fotoğraf seç</div>
+                        <input type="file" name="profileImage" id="profileImage" accept=".jpg,.jpeg,.png,.webp" />
+                        <small>JPG, PNG veya WEBP — en fazla 5 MB. Değiştirmek istemiyorsanız boş bırakın.</small>
+                    </div>
+                </div>
+                @Html.ValidationMessage("profileImage", new { @class = "field-error" })
+            </div>
+
+            <!-- ── CV ── -->
+            <div class="section-title-sm full">CV Dosyası</div>
+
+            <div class="field full">
+                <div class="upload-row">
+                    <div class="cv-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+                    <div class="upload-info">
+                        @if (!string.IsNullOrWhiteSpace(Model.CvUrl))
+                        {
+                            <a href="@Model.CvUrl" target="_blank" class="cv-link">
+                                <i class="bi bi-eye"></i> Mevcut CV'yi görüntüle
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="cv-empty">Henüz CV yüklenmedi — sitedeki "CV İndir" butonu gizli.</div>
+                        }
+                        <div>
+                            <input type="file" name="cvFile" id="cvFile" accept=".pdf,application/pdf" />
+                        </div>
+                        <div class="new-file" id="cvNewName"></div>
+                        <small>Yalnızca PDF — en fazla 10 MB. Yeni CV yüklerseniz eskisi silinir.</small>
+                    </div>
+                </div>
+                @Html.ValidationMessage("cvFile", new { @class = "field-error" })
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/Default/Index" target="_blank" class="btn-cancel"><i class="bi bi-box-arrow-up-right"></i> Sitede Gör</a>
+            <button type="submit" class="btn-save">Kaydet</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        (function () {
+            // Tanıtım yazısı karakter sayacı
+            var desc = document.getElementById('Description');
+            var count = document.getElementById('descCount');
+            function say() { count.textContent = desc.value.length; }
+            desc.addEventListener('input', say);
+            say();
+
+            // Profil fotoğrafı önizleme
+            var imgInput = document.getElementById('profileImage');
+            var preview = document.getElementById('avatarPreview');
+            var ilkHal = preview.innerHTML;
+            imgInput.addEventListener('change', function () {
+                var file = imgInput.files[0];
+                if (!file) { preview.innerHTML = ilkHal; return; }
+                var img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.alt = 'Önizleme';
+                preview.innerHTML = '';
+                preview.appendChild(img);
+            });
+
+            // Seçilen CV'nin adını göster
+            var cvInput = document.getElementById('cvFile');
+            var cvName = document.getElementById('cvNewName');
+            cvInput.addEventListener('change', function () {
+                var file = cvInput.files[0];
+                if (!file) { cvName.style.display = 'none'; return; }
+                cvName.textContent = '✓ Kaydedince yüklenecek: ' + file.name;
+                cvName.style.display = 'block';
+            });
+
+            // Kaydedildi bildirimi
+            var flash = @Json.Serialize(TempData["Success"]?.ToString() ?? "");
+            if (flash) {
+                Swal.fire({
+                    toast: true, position: 'top-end', icon: 'success', title: flash,
+                    showConfirmButton: false, timer: 2600, timerProgressBar: true
+                });
+            }
+        })();
+    </script>
+}
