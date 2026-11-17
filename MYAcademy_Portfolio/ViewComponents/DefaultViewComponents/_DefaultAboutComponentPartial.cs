@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MYAcademy_Portfolio.Context;
+using MYAcademy_Portfolio.Entities;
 
 namespace MYAcademy_Portfolio.ViewComponents.DefaultViewComponents
 {
@@ -13,7 +14,7 @@ namespace MYAcademy_Portfolio.ViewComponents.DefaultViewComponents
         }
         public IViewComponentResult Invoke()
         {
-            var values = _context.Abouts.FirstOrDefault();
+            var values = _context.Abouts.FirstOrDefault() ?? new About();
             ViewBag.v1 = values.NameSurname;
             ViewBag.v2 = values.JobTitle;
             ViewBag.v3 = values.Location;

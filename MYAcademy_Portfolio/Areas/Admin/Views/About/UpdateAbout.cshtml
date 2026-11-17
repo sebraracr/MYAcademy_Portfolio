@@ -1,0 +1,485 @@
+﻿@model MYAcademy_Portfolio.Entities.About
+@{
+    ViewData["Title"] = "Hakkımda";
+    Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
+}
+
+<style>
+    .exp-form {
+        --bg: #f4f3ef;
+        --surface: #fffefb;
+        --line: #ebe8df;
+        --ink: #1f2421;
+        --muted: #7b807c;
+        --green: #86a08b;
+        --green-soft: #e3ece5;
+        --rose-ink: #b4584a;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: var(--ink);
+        width: 100%;
+    }
+
+        .exp-form .intro {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 18px;
+        }
+
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 20px;
+    }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+    .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .field .hint {
+        font-weight: 400;
+        color: var(--muted);
+    }
+
+    .field input[type="text"],
+    .field input[type="url"],
+    .field textarea,
+    .field select {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 13px;
+        padding: 10px 12px;
+        color: var(--ink);
+    }
+
+    .field textarea {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            outline: 2px solid var(--green);
+            outline-offset: 1px;
+            background: #fff;
+        }
+
+    .field-error {
+        display: block;
+        font-size: 12px;
+        color: var(--rose-ink);
+        margin-top: 5px;
+    }
+
+    /* ── Yetenek seçimi: tıklanabilir çipler ── */
+    .skill-picker {
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .skill-picker-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+        .skill-picker-top input {
+            border: 1px solid var(--line) !important;
+            background: #fff !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            font-size: 12px !important;
+            width: 220px !important;
+        }
+
+    .skill-count {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+        .skill-count b {
+            color: var(--ink);
+        }
+
+    .skill-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-height: 190px;
+        overflow-y: auto;
+    }
+
+    .skill-chip {
+        position: relative;
+        margin: 0 !important;
+    }
+
+        .skill-chip input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .skill-chip span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s, border-color .15s, color .15s;
+        }
+
+            .skill-chip span:hover {
+                border-color: var(--green);
+            }
+
+            .skill-chip span i {
+                display: none;
+            }
+
+        .skill-chip input:checked + span {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+        }
+
+            .skill-chip input:checked + span i {
+                display: inline;
+            }
+
+        .skill-chip input:focus-visible + span {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+        }
+
+    /* ── Kapak görseli ── */
+    .image-box {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        border: 1px dashed var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .image-preview {
+        width: 140px;
+        height: 80px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        overflow: hidden;
+        font-size: 22px;
+    }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .image-box input[type="file"] {
+        font-size: 12px;
+    }
+
+    .image-box small {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    /* ── Yayında switch ── */
+    .status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 10px 14px;
+    }
+
+        .status-box .status-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+            .status-box .status-text small {
+                display: block;
+                font-weight: 400;
+                font-size: 11px;
+                color: var(--muted);
+            }
+
+    .switch {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+        .switch input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            margin: 0;
+            z-index: 1;
+        }
+
+        .switch .track {
+            position: absolute;
+            inset: 0;
+            background: #d6d4cb;
+            border-radius: 999px;
+            transition: background .2s;
+        }
+
+            .switch .track::after {
+                content: "";
+                position: absolute;
+                top: 3px;
+                left: 3px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #fff;
+                transition: transform .2s;
+            }
+
+        .switch input:checked + .track {
+            background: var(--green);
+        }
+
+            .switch input:checked + .track::after {
+                transform: translateX(18px);
+            }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+    }
+
+    .btn-cancel,
+    .btn-save {
+        border-radius: 10px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        background: var(--surface);
+        color: var(--ink);
+        border: 1px solid var(--line);
+    }
+
+        .btn-cancel:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+    .btn-save {
+        background: var(--green);
+        color: #fff;
+        border: 0;
+    }
+
+        .btn-save:hover {
+            background: #75927b;
+        }
+
+    @@media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .image-box {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 20px;
+    }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+    .field input[type="email"] {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 13px;
+        padding: 10px 12px;
+        color: var(--ink);
+    }
+
+        .field input[type="email"]:focus {
+            outline: 2px solid var(--green);
+            outline-offset: 1px;
+            background: #fff;
+        }
+
+    .field textarea {
+        min-height: 372px;
+    }
+
+    .char-count {
+        display: block;
+        text-align: right;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 4px;
+    }
+
+    .section-title-sm {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 4px 0 -4px;
+    }
+
+    @@media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="exp-form"">
+    <p class="intro">Sitenizin "Hakkımda" bölümünde görünen bilgileri buradan güncelleyebilirsiniz.</p>
+
+    <form method="post" class="form-card">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly" class="field-error"></div>
+
+        <div class="form-grid">
+            <div class="section-title-sm full">Kişisel Bilgiler</div>
+
+            <div class="field">
+                <label asp-for="NameSurname">Ad Soyad</label>
+                <input type="text" asp-for="NameSurname" placeholder="Örn: Sara Ebrar Acar" />
+                <span asp-validation-for="NameSurname" class="field-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="JobTitle">Unvan</label>
+                <input type="text" asp-for="JobTitle" placeholder="Örn: Bilgisayar Mühendisi" />
+                <span asp-validation-for="JobTitle" class="field-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Email">E-posta</label>
+                <input type="email" asp-for="Email" placeholder="Örn: sara@example.com" />
+                <span asp-validation-for="Email" class="field-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Location">Konum</label>
+                <input type="text" asp-for="Location" placeholder="Örn: İstanbul, Türkiye" />
+                <span asp-validation-for="Location" class="field-error"></span>
+            </div>
+
+            <div class="section-title-sm full">Profesyonel Bilgiler</div>
+
+            <div class="field">
+                <label asp-for="Expert">Uzmanlık Alanı</label>
+                <input type="text" asp-for="Expert" placeholder="Örn: Backend Geliştirme (.NET)" />
+                <span asp-validation-for="Expert" class="field-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="OpenToWork">Çalışma Durumu</label>
+                <input type="text" asp-for="OpenToWork" placeholder="Örn: Yeni projelere ve iş tekliflerine açığım" />
+                <span asp-validation-for="OpenToWork" class="field-error"></span>
+            </div>
+
+            <div class="field full">
+                <label asp-for="Description">Hakkımda Yazısı</label>
+                <textarea asp-for="Description" maxlength="1000"
+                          placeholder="Kendinizi, ilgi alanlarınızı ve hedeflerinizi birkaç cümleyle anlatın."></textarea>
+                <span class="char-count"><span id="descCount">0</span> / 1000</span>
+                <span asp-validation-for="Description" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/Default/Index" target="_blank" class="btn-cancel"><i class="bi bi-box-arrow-up-right"></i> Sitede Gör</a>
+            <button type="submit" class="btn-save">Kaydet</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        (function () {
+            // Açıklama karakter sayacı
+            var desc = document.getElementById('Description');
+            var count = document.getElementById('descCount');
+            function guncelle() { count.textContent = desc.value.length; }
+            desc.addEventListener('input', guncelle);
+            guncelle();
+
+            // Kaydedildi bildirimi
+            var flash = @Json.Serialize(TempData["Success"]?.ToString() ?? "");
+            if (flash) {
+                Swal.fire({
+                    toast: true, position: 'top-end', icon: 'success', title: flash,
+                    showConfirmButton: false, timer: 2600, timerProgressBar: true
+                });
+            }
+        })();
+    </script>
+}
