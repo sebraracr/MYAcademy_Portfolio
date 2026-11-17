@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MYAcademy_Portfolio.Context;
+using MYAcademy_Portfolio.Helpers;
 
 namespace MYAcademy_Portfolio.ViewComponents.DefaultViewComponents
 {
@@ -13,7 +14,7 @@ namespace MYAcademy_Portfolio.ViewComponents.DefaultViewComponents
         }
         public IViewComponentResult Invoke()
         {
-            var values = _context.Educations.ToList();
+            var values = _context.Educations.Where(x => x.IsActive).ToList().OrderByDescending(x => DurationHelper.EndYear(x.Duration)).ThenByDescending(x => DurationHelper.StartYear(x.Duration)).ToList();
             return View(values);
         }
     }
