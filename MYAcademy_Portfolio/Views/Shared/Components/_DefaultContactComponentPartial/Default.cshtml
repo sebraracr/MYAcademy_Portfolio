@@ -37,25 +37,21 @@
                             <div class="fw-bold text-dark">@ViewBag.v4</div>
                         </div>
                     </div>
-
                     <div class="contact-item">
                         <div class="contact-icon bg-icon-mint">
-                            <i class="bi bi-linkedin"></i>
+                            <i class="bi bi-share"></i>
                         </div>
                         <div>
-                            <div class="text-secondary small fw-medium">LinkedIn</div>
-                            <a href="https://linkedin.com" target="_blank" rel="noopener" class="text-decoration-none fw-bold text-dark">@ViewBag.v3</a>
+                            <div class="text-secondary small fw-medium mb-2">Beni takip edin</div>
+                            <div class="d-flex flex-wrap gap-2">
+                                @await Component.InvokeAsync("_DefaultSocialMediaComponentPartial")
+                            </div>
                         </div>
                     </div>
+                    </div>
 
-                    <div class="contact-item">
-                        <div class="contact-icon bg-icon-peach">
-                            <i class="bi bi-github"></i>
-                        </div>
-                        <div>
-                            <div class="text-secondary small fw-medium">GitHub</div>
-                            <a href="https://github.com" target="_blank" rel="noopener" class="text-decoration-none fw-bold text-dark">@ViewBag.v5</a>
-                        </div>
+                    
+                        
                     </div>
 
                     <div class="mt-4 p-3 rounded-4 bg-white border border-light-subtle">

@@ -1,0 +1,12 @@
+﻿@model List<MYAcademy_Portfolio.Entities.SocialMedia>
+
+@foreach (var item in Model)
+{
+    var ikon = (item.Icon ?? "").Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).LastOrDefault() ?? "bi-link-45deg";
+    var eposta = item.Url.StartsWith("mailto:");
+
+    <a href="@item.Url" class="social-btn" aria-label="@item.Name" title="@item.Name"
+        @(eposta ? "" : "target=_blank rel=noopener")>
+        <i class="bi @ikon"></i>
+    </a>
+}

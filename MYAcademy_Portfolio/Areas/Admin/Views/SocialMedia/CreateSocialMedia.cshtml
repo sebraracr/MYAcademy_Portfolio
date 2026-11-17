@@ -1,0 +1,468 @@
+﻿@model MYAcademy_Portfolio.Entities.SocialMedia
+@{
+    ViewData["Title"] = "Yeni Sosyal Medya Bağlantısı";
+    Layout = "~/Areas/Admin/Views/AdminLayout/Index.cshtml";
+    var mevcutIkon = string.IsNullOrWhiteSpace(Model?.Icon) ? "bi-link-45deg" : Model.Icon;
+}
+
+<style>
+    .exp-form {
+        --bg: #f4f3ef;
+        --surface: #fffefb;
+        --line: #ebe8df;
+        --ink: #1f2421;
+        --muted: #7b807c;
+        --green: #86a08b;
+        --green-soft: #e3ece5;
+        --rose-ink: #b4584a;
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        color: var(--ink);
+        width: 100%;
+    }
+
+        .exp-form .intro {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0 0 18px;
+        }
+
+    .form-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 24px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px 20px;
+    }
+
+        .form-grid .full {
+            grid-column: 1 / -1;
+        }
+
+    .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .field .hint {
+        font-weight: 400;
+        color: var(--muted);
+    }
+
+    .field input[type="text"],
+    .field input[type="url"],
+    .field textarea,
+    .field select {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 13px;
+        padding: 10px 12px;
+        color: var(--ink);
+    }
+
+    .field textarea {
+        resize: vertical;
+        min-height: 110px;
+    }
+
+        .field input:focus,
+        .field textarea:focus,
+        .field select:focus {
+            outline: 2px solid var(--green);
+            outline-offset: 1px;
+            background: #fff;
+        }
+
+    .field-error {
+        display: block;
+        font-size: 12px;
+        color: var(--rose-ink);
+        margin-top: 5px;
+    }
+
+    /* ── Yetenek seçimi: tıklanabilir çipler ── */
+    .skill-picker {
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .skill-picker-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+        .skill-picker-top input {
+            border: 1px solid var(--line) !important;
+            background: #fff !important;
+            border-radius: 8px !important;
+            padding: 6px 10px !important;
+            font-size: 12px !important;
+            width: 220px !important;
+        }
+
+    .skill-count {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+        .skill-count b {
+            color: var(--ink);
+        }
+
+    .skill-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        max-height: 190px;
+        overflow-y: auto;
+    }
+
+    .skill-chip {
+        position: relative;
+        margin: 0 !important;
+    }
+
+        .skill-chip input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .skill-chip span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s, border-color .15s, color .15s;
+        }
+
+            .skill-chip span:hover {
+                border-color: var(--green);
+            }
+
+            .skill-chip span i {
+                display: none;
+            }
+
+        .skill-chip input:checked + span {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+        }
+
+            .skill-chip input:checked + span i {
+                display: inline;
+            }
+
+        .skill-chip input:focus-visible + span {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+        }
+
+    /* ── Kapak görseli ── */
+    .image-box {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        border: 1px dashed var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 12px;
+    }
+
+    .image-preview {
+        width: 140px;
+        height: 80px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        overflow: hidden;
+        font-size: 22px;
+    }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .image-box input[type="file"] {
+        font-size: 12px;
+    }
+
+    .image-box small {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    /* ── Yayında switch ── */
+    .status-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        border-radius: 10px;
+        padding: 10px 14px;
+    }
+
+        .status-box .status-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+            .status-box .status-text small {
+                display: block;
+                font-weight: 400;
+                font-size: 11px;
+                color: var(--muted);
+            }
+
+    .switch {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+        .switch input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            margin: 0;
+            z-index: 1;
+        }
+
+        .switch .track {
+            position: absolute;
+            inset: 0;
+            background: #d6d4cb;
+            border-radius: 999px;
+            transition: background .2s;
+        }
+
+            .switch .track::after {
+                content: "";
+                position: absolute;
+                top: 3px;
+                left: 3px;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #fff;
+                transition: transform .2s;
+            }
+
+        .switch input:checked + .track {
+            background: var(--green);
+        }
+
+            .switch input:checked + .track::after {
+                transform: translateX(18px);
+            }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+    }
+
+    .btn-cancel,
+    .btn-save {
+        border-radius: 10px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    .btn-cancel {
+        background: var(--surface);
+        color: var(--ink);
+        border: 1px solid var(--line);
+    }
+
+        .btn-cancel:hover {
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+    .btn-save {
+        background: var(--green);
+        color: #fff;
+        border: 0;
+    }
+
+        .btn-save:hover {
+            background: #75927b;
+        }
+
+    @@media (max-width: 640px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .image-box {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    .icon-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .icon-preview {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+        border-radius: 12px;
+        background: var(--green-soft);
+        color: #4f6b55;
+        display: grid;
+        place-items: center;
+        font-size: 19px;
+    }
+
+    .platforms {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .platform-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 9px;
+        padding: 7px 12px;
+        font-size: 12.5px;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+        .platform-btn:hover {
+            border-color: var(--green);
+        }
+
+    .form-stack {
+        display: grid;
+        gap: 18px;
+    }
+</style>
+
+<div class="exp-form" style="max-width:640px;">
+    <p class="intro">Sitede görünecek bir sosyal medya ya da iletişim bağlantısı ekleyin.</p>
+
+    <form method="post" class="form-card">
+        @Html.AntiForgeryToken()
+
+        <div class="field">
+            <label>Hızlı seçim <span class="hint">— tıklayınca ad, ikon ve link başlangıcı dolar</span></label>
+            <div class="platforms" id="platforms">
+                <button type="button" class="platform-btn" data-name="GitHub" data-icon="bi-github" data-url="https://github.com/"><i class="bi bi-github"></i> GitHub</button>
+                <button type="button" class="platform-btn" data-name="LinkedIn" data-icon="bi-linkedin" data-url="https://www.linkedin.com/in/"><i class="bi bi-linkedin"></i> LinkedIn</button>
+                <button type="button" class="platform-btn" data-name="Medium" data-icon="bi-medium" data-url="https://medium.com/@@"><i class="bi bi-medium"></i> Medium</button>
+                <button type="button" class="platform-btn" data-name="Instagram" data-icon="bi-instagram" data-url="https://www.instagram.com/"><i class="bi bi-instagram"></i> Instagram</button>
+                <button type="button" class="platform-btn" data-name="X" data-icon="bi-twitter-x" data-url="https://x.com/"><i class="bi bi-twitter-x"></i> X</button>
+                <button type="button" class="platform-btn" data-name="YouTube" data-icon="bi-youtube" data-url="https://www.youtube.com/@@"><i class="bi bi-youtube"></i> YouTube</button>
+                <button type="button" class="platform-btn" data-name="E-posta" data-icon="bi-envelope" data-url="mailto:"><i class="bi bi-envelope"></i> E-posta</button>
+                <button type="button" class="platform-btn" data-name="Web Sitesi" data-icon="bi-globe" data-url="https://"><i class="bi bi-globe"></i> Web Sitesi</button>
+            </div>
+        </div>
+
+        <div class="form-stack">
+            <div class="field">
+                <label asp-for="Name">Platform Adı</label>
+                <input type="text" asp-for="Name" placeholder="Örn: GitHub" />
+                <span asp-validation-for="Name" class="field-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Url">Bağlantı</label>
+                <input type="text" asp-for="Url" placeholder="Örn: https://github.com/kullaniciadi" />
+                <span asp-validation-for="Url" class="field-error"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Icon">İkon <span class="hint">(Bootstrap Icons)</span></label>
+                <div class="icon-row">
+                    <span class="icon-preview"><i id="iconPreview" class="bi @mevcutIkon"></i></span>
+                    <input type="text" asp-for="Icon" placeholder="Örn: bi-github" />
+                </div>
+                <span asp-validation-for="Icon" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/Admin/SocialMedia/SocialMediaList" class="btn-cancel">Vazgeç</a>
+            <button type="submit" class="btn-save">Bağlantıyı Kaydet</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    (function () {
+        var nameInput = document.getElementById('Name');
+        var urlInput = document.getElementById('Url');
+        var iconInput = document.getElementById('Icon');
+        var preview = document.getElementById('iconPreview');
+
+        function ikonGuncelle() {
+            var v = (iconInput.value || '').trim().split(/\s+/).pop() || 'bi-link-45deg';
+            preview.className = 'bi ' + v;
+        }
+        iconInput.addEventListener('input', ikonGuncelle);
+
+        document.getElementById('platforms').addEventListener('click', function (e) {
+            var btn = e.target.closest('.platform-btn');
+            if (!btn) return;
+            nameInput.value = btn.dataset.name;
+            iconInput.value = btn.dataset.icon;
+            urlInput.value = btn.dataset.url;
+            ikonGuncelle();
+            urlInput.focus();
+            urlInput.setSelectionRange(urlInput.value.length, urlInput.value.length);
+        });
+    })();
+</script>

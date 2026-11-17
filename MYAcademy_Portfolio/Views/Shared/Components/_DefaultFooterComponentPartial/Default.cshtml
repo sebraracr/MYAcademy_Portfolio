@@ -24,15 +24,12 @@
             <!-- Col 3: Social Links -->
             <div class="col-lg-4 text-center text-lg-end">
                 <div class="d-inline-flex gap-2">
-                    <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="GitHub">
-                        <i class="bi bi-github"></i>
-                    </a>
-                    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="LinkedIn">
-                        <i class="bi bi-linkedin"></i>
-                    </a>
-                    <a href="https://medium.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Medium">
-                        <i class="bi bi-medium"></i>
-                    </a>
+                    <!-- Col 3: Social Links -->
+                    <div class="col-lg-4 text-center text-lg-end">
+                        <div class="d-inline-flex gap-2">
+                            @await Component.InvokeAsync("_DefaultSocialMediaComponentPartial")
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
