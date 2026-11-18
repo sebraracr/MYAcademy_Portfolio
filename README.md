@@ -321,7 +321,8 @@ Bilgisayar Mühendisi · Full Stack Developer
 ⭐ Projeyi beğendiyseniz yıldız vermeyi unutmayın!
 
 </div>
-<img width="1915" height="927" alt="Ekran görüntüsü 2026-11-18 145519" src="https://github.com/user-attachments/assets/bd60d399-3502-41b6-ace1-849cc3de656b" />
+
+<img width="1287" height="928" alt="Ekran görüntüsü 2026-11-18 152839" src="https://github.com/user-attachments/assets/1767617b-e520-4499-be2f-4170d117413d" />
 <img width="1906" height="933" alt="Ekran görüntüsü 2026-11-18 145533" src="https://github.com/user-attachments/assets/fe419e77-c649-4289-9e52-a767cfb8a40f" />
 <img width="1160" height="950" alt="Ekran görüntüsü 2026-11-18 145618" src="https://github.com/user-attachments/assets/e84413c1-1700-486d-815d-c7df396966a4" />
 <img width="1432" height="939" alt="Ekran görüntüsü 2026-11-18 145633" src="https://github.com/user-attachments/assets/13c8d0d2-b1b8-4d23-98d3-a9ffa7dadead" />
