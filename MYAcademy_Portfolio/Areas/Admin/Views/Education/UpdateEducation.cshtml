@@ -162,17 +162,7 @@
             <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2"></div>
 
             <div class="row g-4">
-                <!-- Pozisyon -->
-                <div class="col-md-6">
-                    <label asp-for="SubTitle" class="form-label">Pozisyon / Ünvan <span class="req">*</span></label>
-                    <div class="input-icon-wrap">
-                        <i class="bi bi-person-badge"></i>
-                        <input asp-for="SubTitle" class="form-control" placeholder="Örn: Senior Software Engineer" required />
-                    </div>
-                    <span asp-validation-for="SubTitle"></span>
-                </div>
-
-                <!-- Şirket -->
+      
                 <div class="col-md-6">
                     <label asp-for="Title" class="form-label">Okul / Üniversite <span class="req">*</span></label>
                     <div class="input-icon-wrap">
@@ -202,29 +192,14 @@
                     <span asp-validation-for="Duration"></span>
                 </div>
 
-                @* <!-- Çalışma Tipi -->
-                <div class="col-md-6">
-                    <label asp-for="WorkType" class="form-label">Çalışma Tipi <span class="req">*</span></label>
-                    <div class="input-icon-wrap">
-                        <i class="bi bi-clock-history"></i>
-                        <select asp-for="WorkType" class="form-select" required>
-                            <option value="">Seçiniz...</option>
-                            @foreach (var type in workTypes)
-                            {
-                                <option value="@type">@type</option>
-                            }
-                        </select>
-                    </div>
-                    <span asp-validation-for="WorkType"></span>
-                </div> *@
-
+               
                 <!-- Durum -->
                 <div class="col-md-6">
                     <label class="form-label">Durum</label>
                     <div class="status-box">
                         <div>
-                            <div class="fw-semibold" style="font-size: 0.86rem;">Halen burada çalışıyorum</div>
-                            <small class="text-secondary">Aktif ise portfolyoda "Devam Ediyor" olarak görünür.</small>
+                            <div class="fw-semibold" style="font-size: 0.86rem;">Portfolyoda gözüksün mü?</div>
+                            <small class="text-secondary">Aktif ise portfolyoda gözükür.</small>
                         </div>
                         <div class="form-check form-switch m-0">
                             <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" />
