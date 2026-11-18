@@ -3,6 +3,7 @@
     "MYAcademy_Portfolio": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "Admin",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
